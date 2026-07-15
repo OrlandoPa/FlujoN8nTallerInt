@@ -73,3 +73,160 @@ Para desplegar la infraestructura de n8n en Render (el servicio web junto con la
    * Crea o ingresa con tu cuenta de propietario en la plataforma.
    * Importa manualmente los archivos JSON de los flujos (`FlujoWhatsAppN8N.json` y `FlujoRecordatoriosAutomaticosN8N.json`) desde la interfaz de n8n.
    * Configura las credenciales necesarias (Google Calendar, Gmail, PostgreSQL, Chatwoot) dentro de cada flujo importado para iniciar las pruebas y ajustes del sistema.
+
+---
+
+## 💬 Despliegue de Chatwoot y Traefik (VPS / Local)
+
+Para conectar de manera gratuita y sin límites la API de WhatsApp Cloud (Meta) con n8n, se utiliza **Chatwoot** como plataforma omnicanal de soporte y pasarela. A continuación se detalla cómo desplegar Chatwoot junto con **Traefik** como proxy reverso con SSL automático en un servidor VPS.
+
+### Archivos de Configuración en el Repositorio:
+* **Traefik proxy:** [chatwoot-vps/traefik/docker-compose.yml](file:///c:/Users/lalop/Desktop/Nueva%20carpeta%20%282%29/FlujoN8nTallerInt/chatwoot-vps/traefik/docker-compose.yml)
+* **Chatwoot compose:** [chatwoot-vps/chatwoot/docker-compose.yml](file:///c:/Users/lalop/Desktop/Nueva%20carpeta%20%282%29/FlujoN8nTallerInt/chatwoot-vps/chatwoot/docker-compose.yml)
+* **Plantilla de variables (.env):** [chatwoot-vps/chatwoot/.env.example](file:///c:/Users/lalop/Desktop/Nueva%20carpeta%20%282%29/FlujoN8nTallerInt/chatwoot-vps/chatwoot/.env.example)
+
+### Requisitos de Hardware mínimos:
+* **CPU:** 2 núcleos o más.
+* **RAM:** 4 GB de RAM mínimos (se recomiendan 8 GB para mejor desempeño en producción).
+* **Almacenamiento:** 20 GB de disco SSD disponibles.
+
+---
+
+### Paso 1: Preparación del Servidor VPS
+
+Actualiza tu servidor (Ubuntu/Debian) e instala la última versión estable de Docker y Docker Compose:
+
+```bash
+# Actualizar el sistema
+sudo apt update && sudo apt upgrade -y
+
+# Instalar dependencias requeridas
+sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+
+# Agregar llave GPG oficial de Docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+# Agregar el repositorio estable de Docker
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" -y
+
+# Instalar Docker CE
+sudo apt update && sudo apt install docker-ce docker-ce-cli containerd.io -y
+
+# Habilitar Docker para iniciar con el sistema
+sudo systemctl enable docker && sudo systemctl start docker
+
+# Instalar Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+---
+
+### Paso 2: Despliegue de Traefik (Proxy Reverso)
+
+Traefik gestionará los certificados de seguridad SSL de Let's Encrypt de forma automática.
+
+1. **Crear la red externa de Docker para Traefik:**
+   ```bash
+   docker network create traefik
+   ```
+2. **Crear carpetas y estructurar Traefik:**
+   ```bash
+   mkdir -p ~/traefik/letsencrypt
+   cd ~/traefik
+   ```
+3. Copia el archivo [docker-compose.yml](file:///c:/Users/lalop/Desktop/Nueva%20carpeta%20%282%29/FlujoN8nTallerInt/chatwoot-vps/traefik/docker-compose.yml) de Traefik a este directorio y levanta el servicio reemplazando `${EMAIL}` con tu correo para Let's Encrypt:
+   ```bash
+   # Iniciar Traefik en segundo plano
+   EMAIL="tu-correo@ejemplo.com" docker-compose up -d
+   ```
+
+---
+
+### Paso 3: Configuración y Despliegue de Chatwoot
+
+1. **Crear carpetas de Chatwoot:**
+   ```bash
+   mkdir -p ~/chatwoot
+   cd ~/chatwoot
+   ```
+2. Copia los archivos del repositorio [docker-compose.yml](file:///c:/Users/lalop/Desktop/Nueva%20carpeta%20%282%29/FlujoN8nTallerInt/chatwoot-vps/chatwoot/docker-compose.yml) y [.env.example](file:///c:/Users/lalop/Desktop/Nueva%20carpeta%20%282%29/FlujoN8nTallerInt/chatwoot-vps/chatwoot/.env.example) a tu directorio.
+3. Genera una cadena secreta segura para Chatwoot:
+   ```bash
+   openssl rand -hex 64
+   ```
+4. Renombra `.env.example` a `.env` (`mv .env.example .env`) y edita las siguientes variables obligatorias:
+   * **`SECRET_KEY_BASE`**: Pega el resultado del comando anterior.
+   * **`FRONTEND_URL`**: Tu dominio de acceso (e.g., `https://chatwoot.tudominio.com`).
+   * **`ASSET_CDN_HOST`**: Coloca el mismo valor de tu `FRONTEND_URL`.
+   * **`REDIS_PASSWORD`** y **`POSTGRES_PASSWORD`**: Define contraseñas seguras.
+5. Edita el archivo `docker-compose.yml` de Chatwoot:
+   * En las etiquetas de Traefik del servicio `rails`, cambia `chatwoot.tudominio.com` por tu dominio DNS real.
+   * Verifica que las credenciales de base de datos coincidan con tu `.env`.
+6. Levanta los contenedores descargando las imágenes primero:
+   ```bash
+   docker-compose pull
+   docker-compose up -d
+   ```
+
+---
+
+### Paso 4: Inicialización de la Base de Datos y Creación de Administrador
+
+Una vez levantados los contenedores, ejecuta los siguientes comandos para configurar el esquema de la base de datos de Chatwoot:
+
+1. **Correr las migraciones e inicialización:**
+   ```bash
+   docker-compose exec rails bundle exec rails db:create
+   docker-compose exec rails bundle exec rails db:migrate
+   docker-compose exec rails bundle exec rails db:seed
+   ```
+2. **Crear el primer usuario administrador de la plataforma:**
+   Ingresa a la consola interactiva de Rails:
+   ```bash
+   docker-compose exec rails bundle exec rails console
+   ```
+   Dentro de la consola interactiva, ejecuta los siguientes comandos en Ruby:
+   ```ruby
+   # Instanciar el nuevo usuario
+   u = User.new
+   u.name = "Tu Nombre"
+   u.email = "tu-email@ejemplo.com"
+   u.password = "tu-contraseña-segura"
+   u.password_confirmation = "tu-contraseña-segura"
+   u.save!
+
+   # Crear la cuenta principal
+   account = Account.create!(name: "Mi Clinica")
+
+   # Asociar el usuario creado a la cuenta con privilegios de administrador
+   AccountUser.create!(
+     account_id: account.id,
+     user_id: u.id,
+     role: "administrator"
+   )
+
+   # Salir de la consola
+   exit
+   ```
+
+---
+
+### Paso 5: Acceso y Mantenimiento
+
+1. Abre tu navegador y accede a tu dominio configurado (e.g., `https://chatwoot.tudominio.com`). Inicia sesión con el correo y la contraseña creados en el paso anterior.
+2. **Hacer Backup de la Base de Datos:**
+   ```bash
+   docker-compose exec postgres pg_dump -U postgres chatwoot > backup_$(date +%Y%m%d_%H%M%S).sql
+   ```
+3. **Restaurar Backup:**
+   ```bash
+   docker-compose exec -T postgres psql -U postgres chatwoot < backup_archivo.sql
+   ```
+4. **Actualizar Chatwoot:**
+   ```bash
+   docker-compose down
+   docker-compose pull
+   docker-compose up -d
+   docker-compose exec rails bundle exec rails db:migrate
+   ```
