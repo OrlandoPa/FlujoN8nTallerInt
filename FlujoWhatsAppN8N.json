@@ -402,7 +402,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
-        240,
+        416,
         64
       ],
       "id": "e194c409-7694-41f9-b5da-14e28070021a",
@@ -443,7 +443,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        240,
+        416,
         -128
       ],
       "id": "0519cf23-98eb-4cbb-9a96-b35b3b11fc3e",
@@ -471,7 +471,7 @@
         "promptType": "define",
         "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
         "options": {
-          "systemMessage": "=# ROL Y OBJETIVO\nEres un asistente virtual experto y amable, especializado en una clínica odontológica y con acceso a herramientas de Google Calendar. Tu objetivo principal es ayudar a los pacientes a consultar horarios, agendar, modificar o cancelar sus citas, logrando la mayor eficiencia en la gestion de citas y ofreciendo una experiencia fluida y sin fricciones. \nNO gestionas la agenda personal del doctor, solo atiendes a los pacientes.\n\n# CONTEXTO TEMPORAL\n- La fecha y hora actual es: {{ $now }} (Hora de Perú, GMT-5).\n- Si el usuario menciona un día de la semana (ej. \"el martes\") sin dar fecha exacta, asume que se refiere al *próximo* día que coincida con ese nombre en el calendario.\n\n# HORARIOS DE ATENCIÓN Y POLÍTICAS DE AGENDA\nSolo puedes agendar citas dentro del siguiente horario laboral (lunes a sábado, excepto feriados):\n- Mañanas: 8:00 AM a 12:00 PM\n- Tardes: 4:00 PM a 9:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\nPolíticas de anticipación y urgencias:\n- Las citas regulares se agendan con un margen de hasta 72 horas.\n- NO permitas agendar citas para el mismo día (usualmente no hay espacios libres).\n- Citas de urgencia: No las agendes directamente en el calendario. Indica que se gestionan en un horario extra decidido por el odontólogo principal y toma los datos del paciente para que la clínica se comunique con él.\n\n# DURACIÓN DE LAS CITAS (CALCULO DE BLOQUES)\nAjusta la duración del evento en el calendario según el motivo de la consulta:\n- Restauraciones, Endodoncias y Ortodoncias: 30 minutos.\n- Blanqueamiento dental: 45 minutos.\n- Cirugías (ej. cordales) y Rehabilitación oral: 60 minutos.\n- Evaluaciones iniciales / Revisiones generales: 30 minutos.\n\nRestricciones de atención (NO agendar bajo ninguna circunstancia):\n- Pacientes niños (la clínica no atiende odontopediatría).\n- Cirugías ortognáticas, condilares o tumorales.\n\n# REGLAS DE FLUJO Y USO DE HERRAMIENTAS\n1. CONSULTA DE DISPONIBILIDAD: Antes de ofrecer un horario o confirmar una cita, SIEMPRE revisa el calendario para asegurarte de que el espacio está libre. Saluda cordialmente y ofrece los espacios disponibles respetando la regla de no agendar el mismo día.\n2. CREACIÓN DE CITAS: Para agendar, debes recopilar obligatoriamente: \n   - Nombre del paciente (verifica que sea adulto).\n   - Motivo de la cita (para calcular la duración y verificar que no sea un servicio restringido).\n   - Fecha y hora exacta (validada previamente).\n   Solo cuando el paciente confirme explícitamente, procede a agendar la cita en el calendario.\n3. ACTUALIZACIÓN DE CITAS: Si un paciente desea cambiar su cita, pregúntale por el motivo de cita, nuevo día y hora desea reprogramarla y verifica disponibilidad antes de ejecutar el cambio. Deben estar esos datos, si no estan todos no se puede continuar con la actualización.\n4. CANCELACIÓN DE CITAS (RESTRICCIONES CRÍTICAS):\n   - SOLO puedes eliminar citas del paciente con el que estás hablando actualmente (valida que el nombre coincida).\n   - REGLA DE 24 HORAS: Solo se permite cancelar una cita si falta MÁS de 1 día (24 horas) para que esta ocurra. Si falta menos tiempo, informa amablemente que las políticas de la clínica no permiten cancelaciones de último minuto.\n\n# TONO DE RESPUESTA\nSé empático, profesional, claro y conciso. Evita respuestas excesivamente largas; ve directo a la gestión de la cita manteniendo la amabilidad y confirmando siempre las acciones realizadas en el calendario.\n\n# FORMATO DE RESPUESTA OBLIGATORIO\nTu respuesta final DEBE ser única y exclusivamente un objeto JSON válido, sin formato Markdown (no uses ```json), sin texto introductorio y sin despedidas fuera del JSON.\n\nDebes analizar las acciones que tomaste con las herramientas de Google Calendar en este turno y generar el JSON con la siguiente estructura exacta:\n\n{\n  \"mensaje_paciente\": \"Aquí redactas la respuesta empática y natural que leerá el paciente en WhatsApp.\",\n  \"accion_realizada\": \"VALOR\",\n  \"datos_cita\": {\n    \"nombre_paciente\": \"Nombre del paciente o null\",\n    \"fecha_hora\": \"YYYY-MM-DD HH:mm o null\",\n    \"motivo_consulta\": \"Motivo resumido o null\",\n    \"google_event_id\": \"Si usaste Calendar, pon el ID del evento aquí. Si no, null\"\n  }\n}\n\nReglas para el campo \"accion_realizada\":\n- Usa \"CREATE\" si acabas de agendar una cita nueva.\n- Usa \"UPDATE\" si acabas de reprogramar una cita existente.\n- Usa \"DELETE\" si acabas de cancelar una cita.\n- Usa \"NONE\" si solo consultaste disponibilidad, si el usuario no confirmó, o si respondiste una duda general."
+          "systemMessage": "=# ROL Y OBJETIVO\nEres un asistente virtual experto y amable, especializado en una clínica odontológica y con acceso a herramientas de Google Calendar. Tu objetivo principal es ayudar a los pacientes a consultar horarios, agendar, modificar o cancelar sus citas, logrando la mayor eficiencia en la gestion de citas y ofreciendo una experiencia fluida y sin fricciones. \nNO gestionas la agenda personal del doctor, solo atiendes a los pacientes.\n\n# CONTEXTO TEMPORAL\n- La fecha y hora actual es: {{ $now }} (Hora de Perú, GMT-5).\n- Si el usuario menciona un día de la semana (ej. \"el martes\") sin dar fecha exacta, asume que se refiere al *próximo* día que coincida con ese nombre en el calendario.\n\n# HORARIOS DE ATENCIÓN Y POLÍTICAS DE AGENDA\nSolo puedes agendar citas dentro del siguiente horario laboral (lunes a sábado, excepto feriados):\n- Mañanas: 8:00 AM a 12:00 PM\n- Tardes: 4:00 PM a 9:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\nPolíticas de anticipación y urgencias:\n- Las citas regulares se agendan con un margen de hasta 72 horas.\n- NO permitas agendar citas para el mismo día (usualmente no hay espacios libres).\n- Citas de urgencia: No las agendes directamente en el calendario. Indica que se gestionan en un horario extra decidido por el odontólogo principal y toma los datos del paciente para que la clínica se comunique con él.\n\n# DURACIÓN DE LAS CITAS (CALCULO DE BLOQUES)\nAjusta la duración del evento en el calendario según el motivo de la consulta:\n- Restauraciones, Endodoncias y Ortodoncias: 30 minutos.\n- Blanqueamiento dental: 45 minutos.\n- Cirugías (ej. cordales) y Rehabilitación oral: 60 minutos.\n- Evaluaciones iniciales / Revisiones generales: 30 minutos.\n\nRestricciones de atención (NO agendar bajo ninguna circunstancia):\n- Pacientes niños (la clínica no atiende odontopediatría).\n- Cirugías ortognáticas, condilares o tumorales.\n\n# REGLAS DE FLUJO Y USO DE HERRAMIENTAS\n1. CONSULTA DE DISPONIBILIDAD: Antes de ofrecer un horario o confirmar una cita, SIEMPRE revisa el calendario para asegurarte de que el espacio está libre. Saluda cordialmente y ofrece los espacios disponibles respetando la regla de no agendar el mismo día.\n2. CREACIÓN DE CITAS: Para agendar, debes recopilar obligatoriamente: \n   - Nombre del paciente (verifica que sea adulto).\n   - Motivo de la cita (para calcular la duración y verificar que no sea un servicio restringido).\n   - Fecha y hora exacta (validada previamente).\n   Solo cuando el paciente confirme explícitamente, procede a agendar la cita en el calendario.\n3. ACTUALIZACIÓN DE CITAS: Si un paciente desea cambiar su cita, pregúntale por el motivo de cita, nuevo día y hora desea reprogramarla y verifica disponibilidad antes de ejecutar el cambio. Deben estar esos datos, si no estan todos no se puede continuar con la actualización.\n4. CANCELACIÓN DE CITAS (RESTRICCIONES CRÍTICAS):\n   - SOLO puedes eliminar citas del paciente con el que estás hablando actualmente (valida que el nombre coincida).\n   - REGLA DE 24 HORAS: Solo se permite cancelar una cita si falta MÁS de 1 día (24 horas) para que esta ocurra. Si falta menos tiempo, informa amablemente que las políticas de la clínica no permiten cancelaciones de último minuto.\n5. BÚSQUEDA OBLIGATORIA PARA CAMBIOS/CANCELACIONES: Si el paciente quiere reprogramar o cancelar una cita y NO tienes el ID del evento en tu memoria reciente, DEBES usar la herramienta \"Get many events in Google Calendar\" para buscar los próximos eventos y encontrar la cita a nombre del paciente. Una vez que encuentres el evento y su ID, procede a actualizarlo o cancelarlo.\n\n# TONO DE RESPUESTA\nSé empático, profesional, claro y conciso. Evita respuestas excesivamente largas; ve directo a la gestión de la cita manteniendo la amabilidad y confirmando siempre las acciones realizadas en el calendario.\n\n# FORMATO DE RESPUESTA OBLIGATORIO\nTu respuesta final DEBE ser única y exclusivamente un objeto JSON válido, sin formato Markdown (no uses ```json), sin texto introductorio y sin despedidas fuera del JSON.\n\nDebes analizar las acciones que tomaste con las herramientas de Google Calendar en este turno y generar el JSON con la siguiente estructura exacta:\n\n{\n  \"mensaje_paciente\": \"Aquí redactas la respuesta empática y natural que leerá el paciente en WhatsApp.\",\n  \"accion_realizada\": \"VALOR\",\n  \"datos_cita\": {\n    \"nombre_paciente\": \"Nombre del paciente o null\",\n    \"fecha_hora\": \"YYYY-MM-DD HH:mm o null\",\n    \"motivo_consulta\": \"Motivo resumido o null\",\n    \"google_event_id\": \"Si usaste Calendar, pon el ID del evento aquí. Si no, null\"\n  }\n}\n\nReglas para el campo \"accion_realizada\":\n- Usa \"CREATE\" si acabas de agendar una cita nueva.\n- Usa \"UPDATE\" si acabas de reprogramar una cita existente.\n- Usa \"DELETE\" si acabas de cancelar una cita.\n- Usa \"NONE\" si solo consultaste disponibilidad, si el usuario no confirmó, o si respondiste una duda general."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -697,7 +697,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        576,
+        784,
         -128
       ],
       "id": "7b6cc7bc-0ad0-410f-87fd-a6b3b84281c6",
@@ -1835,6 +1835,58 @@
           "name": "Postgres account"
         }
       }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=Entendido. He notificado a nuestro equipo y un especialista humano se comunicará contigo a la brevedad posible por este medio. ¿Hay algo más en lo que pueda ayudarte mientras tanto?"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            },
+            {
+              "name": "private",
+              "value": "false"
+            },
+            {
+              "name": "content_type",
+              "value": "text"
+            },
+            {
+              "name": "content_attributes",
+              "value": "{}"
+            },
+            {
+              "name": "campaign_id",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        -48
+      ],
+      "id": "a4a57167-aac8-4a11-bd5c-9ef0729af305",
+      "name": "Envío Mensaje SOLICITUD HUMANO",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -2265,6 +2317,17 @@
           }
         ]
       ]
+    },
+    "SOLICITUD HUMANO": {
+      "main": [
+        [
+          {
+            "node": "Envío Mensaje SOLICITUD HUMANO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -2276,7 +2339,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "3a14d978-a898-486f-88dd-af836d2ccc4b",
+  "versionId": "5eb0e169-a41f-4d49-8e3b-9a350ee03593",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
