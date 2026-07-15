@@ -232,12 +232,11 @@
           "conditions": [
             {
               "id": "d6232efb-e6ea-4f2f-b132-85435b03a49d",
-              "leftValue": "={{ $json.messageId }}",
-              "rightValue": "",
+              "leftValue": "={{ $json.labelIds[0] }}",
+              "rightValue": "SENT",
               "operator": {
                 "type": "string",
-                "operation": "notEmpty",
-                "singleValue": true
+                "operation": "equals"
               }
             }
           ],
@@ -311,7 +310,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "d31f8739-b374-4e44-ae9f-7acacc33d25c",
+  "versionId": "0cacc996-48f9-4d8a-bd88-cbb6873a5f9b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
