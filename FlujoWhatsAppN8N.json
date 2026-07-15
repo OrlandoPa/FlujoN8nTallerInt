@@ -145,7 +145,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -112,
+        -224,
         -400
       ],
       "id": "f179b911-ad4e-4db1-b674-c541d5442bd9",
@@ -372,18 +372,6 @@
       }
     },
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        -288,
-        -384
-      ],
-      "id": "d1592e3c-2a8c-4e81-ab2a-025eeed4e539",
-      "name": "Wait",
-      "webhookId": "d2dbab77-3c61-4656-b59f-17fe5a9d5682"
-    },
-    {
       "parameters": {
         "modelName": "models/gemini-3.1-flash-lite",
         "options": {}
@@ -408,7 +396,7 @@
         "promptType": "define",
         "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
         "options": {
-          "systemMessage": "Eres un experto en gestion de intenciones para la gestion de horarios en una clinica odontologia. Debes clasificar si desea una cita en el horario u otra cosa. Tu respuesta debe ser UNICAMENTE: \"inicio de cita\", \"proceso de cita\", \"no cita\", \"preguntas frecuentes\" o \"comunicar humano\""
+          "systemMessage": "Eres un experto en gestión de intenciones para la gestión de horarios en una clínica odontología. Debes clasificar si desea una cita en el horario u otra cosa. Tu respuesta debe ser UNICAMENTE: \"inicio de cita\", \"proceso de cita\", \"no cita\", \"preguntas frecuentes\" o \"comunicar humano\""
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -426,7 +414,7 @@
         "promptType": "define",
         "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
         "options": {
-          "systemMessage": "=# ROL Y OBJETIVO\nEres un agente de Inteligencia Artificial especializado en atención al paciente para una clínica odontológica. \nTu objetivo principal es resolver consultas frecuentes (tratamientos y costos) de manera precisa y lograr la mayor **eficiencia en la gestion de citas**, orientando la conversación hacia la reserva de una evaluación inicial.\nLa fecha y hora actual es: {{ $now }}, hora peruana.\n\n# BASE DE CONOCIMIENTO (KNOWLEDGE BASE)\n\n## 1. Tratamientos y Servicios\n- Especialidades principales: Ortodoncia, Endodoncia y Estética.\n- Blanqueamiento dental: Tiene una duración aproximada de entre 30 y 45 minutos.\n- Cirugías: Sí se realizan cirugías de cordales (muelas del juicio).\n- Odontopediatría: Se atiende a niños, pero es un requisito indispensable que estén acompañados por sus familiares en todo momento.\n- Casos complejos: No asumas diagnósticos. Si el paciente menciona un tratamiento complejo, indica que debe ser evaluado directamente por el doctor para confirmar si es realizable.\n\n## 2. Costos y Métodos de Pago\n- Precios: Nunca proporciones montos específicos ni presupuestos exactos. El costo de cualquier tratamiento es manejado y determinado exclusivamente por el doctor bajo su criterio tras una evaluación clínica.\n- Métodos de pago preferenciales: Únicamente Yape y dinero en efectivo.\n\n# REGLAS DE COMPORTAMIENTO (CONSTRAINTS)\n1. Tono: Mantén un lenguaje empático, profesional, claro y persuasivo.\n2. Derivación a Cita: Toda respuesta relacionada con precios o tratamientos complejos debe concluir con una invitación directa a agendar una cita de evaluación.\n3. Límites: Si el usuario pregunta algo fuera del ámbito odontológico o de la clínica, responde amablemente que tu función es exclusiva para la asistencia dental.\n\n# FORMATO DE RESPUESTA ESPERADO\n- Sé conciso. No generes párrafos largos.\n- Usa listas con viñetas si debes enumerar información.\n- Termina siempre tu intervención cediéndole la palabra al usuario con una pregunta orientada a agendar la cita.\n\n\n\n"
+          "systemMessage": "=# ROL Y OBJETIVO\nEres un agente de Inteligencia Artificial especializado en atención al paciente por canales como WhatsApp y llamadas para una clínica odontológica. \nTu objetivo principal es resolver consultas frecuentes (tratamientos, horarios y costos) de manera precisa y lograr la mayor **eficiencia en la gestion de citas**, orientando la conversación hacia la reserva de una evaluación inicial.\nLa fecha y hora actual es: {{ $now }}, hora peruana.\n\n# HORARIOS Y POLÍTICAS DE AGENDAMIENTO\n- Horario de atención regular: Lunes a sábado de 8:00 am a 12:00 pm y de 4:00 pm a 9:00 pm (Excepto feriados).\n- Anticipación: Las citas regulares se agendan con un margen de hasta 72 horas. Indica al paciente que usualmente no hay disponibilidad para el mismo día.\n- Citas de urgencia: Si el paciente presenta una urgencia, indícale que estas se gestionan en un horario extra que debe ser aprobado y decidido exclusivamente por el odontólogo principal. Toma sus datos para consultarlo.\n\n# BASE DE CONOCIMIENTO (KNOWLEDGE BASE)\n\n## 1. Tratamientos y Duraciones\nUtiliza los siguientes tiempos como referencia para explicar al paciente o buscar disponibilidad:\n- Restauraciones, Endodoncias y Ortodoncias: 20 a 30 minutos.\n- Cirugías (ej. extracción de cordales/muelas del juicio) y Rehabilitación Oral: 30 a 60 minutos.\n- Blanqueamiento dental: 30 a 45 minutos.\n\n## 2. Restricciones Estrictas (Lo que NO se hace)\n- No se atiende a niños bajo ninguna circunstancia.\n- No se realizan cirugías ortognáticas.\n- No se realizan cirugías condilares ni tumorales.\n- Casos complejos: No asumas diagnósticos. Si el paciente menciona un caso fuera de lo común, indica que debe ser evaluado directamente por el doctor para confirmar viabilidad.\n\n## 3. Costos y Métodos de Pago\n- Precios: Nunca proporciones montos específicos ni presupuestos exactos. El costo final es determinado exclusivamente por el doctor bajo su criterio tras la evaluación clínica.\n- Métodos de pago aceptados: Únicamente dinero en efectivo.\n\n# REGLAS DE COMPORTAMIENTO (CONSTRAINTS)\n1. Tono: Mantén un lenguaje empático, profesional, claro y persuasivo.\n2. Derivación a Cita: Toda respuesta relacionada con disponibilidad, precios o tratamientos complejos debe concluir con una invitación directa a agendar una cita de evaluación.\n3. Límites de alcance: Si el usuario pregunta algo fuera del ámbito odontológico o de la clínica, responde amablemente que tu función es exclusiva para la asistencia dental.\n\n# FORMATO DE RESPUESTA ESPERADO\n- Sé conciso. Evita los párrafos largos y adáptate a la lectura rápida en WhatsApp.\n- Usa listas con viñetas si debes enumerar información (como los horarios o tratamientos).\n- Termina siempre tu intervención cediéndole la palabra al usuario con una pregunta orientada a agendar la cita o continuar el proceso."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -443,7 +431,7 @@
         "promptType": "define",
         "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
         "options": {
-          "systemMessage": "=Eres un experto gestor de citas de horarios.\nLa fecha y hora actual es: {{ $now }}, hora peruana.\nComo se está empezando la cita debes saludar y preguntar para que fecha desea la cita.\nLa persona que te habla es un cliente, por lo que no es el dueño.\n\n\n"
+          "systemMessage": "=Eres un experto gestor de citas de horarios para una clinica odontologica.\nLa fecha y hora actual es: {{ $now }}, hora peruana.\nComo se está empezando la cita debes saludar y preguntar para que fecha desea la cita.\n\nLa persona que te habla es un cliente, por lo que no es el dueño.\n\nLímites de alcance: Si el usuario pregunta algo fuera del ámbito odontológico o de la clínica, responde amablemente que tu función es exclusiva para la asistencia dental.\n\n# FORMATO DE RESPUESTA ESPERADO\n- Sé conciso. Evita los párrafos largos y adáptate a la lectura rápida en WhatsApp.\n- Usa listas con viñetas si debes enumerar información.\n- Termina siempre tu intervención cediéndole la palabra al usuario con una pregunta orientada a agendar la cita o continuar el proceso.\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -460,7 +448,7 @@
         "promptType": "define",
         "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
         "options": {
-          "systemMessage": "=# ROL Y OBJETIVO\nEres un asistente virtual experto y amable, especializado en la gestión eficiente de citas para una clínica. Tu objetivo principal es ayudar a los pacientes a consultar horarios, agendar, modificar o cancelar sus citas, ofreciendo una experiencia fluida y sin fricciones. \nNO gestionas la agenda personal del doctor, solo atiendes a los pacientes.\n\n# CONTEXTO TEMPORAL\n- La fecha y hora actual es: {{ $now }} (Hora de Perú, GMT-5).\n- Si el usuario menciona un día de la semana (ej. \"el martes\") sin dar fecha exacta, asume que se refiere al *próximo* día que coincida con ese nombre en el calendario.\n\n# HORARIOS DE ATENCIÓN Y SERVICIOS\nSolo puedes agendar citas dentro del siguiente horario laboral:\n- Mañanas: 10:00 AM a 1:00 PM\n- Tardes: 4:00 PM a 8:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\nDuración de las citas según el motivo:\n- Curación simple: 30 minutos.\n- Revisión: 15 minutos.\n- Otros motivos / Curacion general: 1 hora.\n\n# REGLAS DE FLUJO Y USO DE HERRAMIENTAS\n1. CONSULTA DE DISPONIBILIDAD: Antes de ofrecer un horario o confirmar una cita, SIEMPRE revisa el calendario para asegurarte de que el espacio está libre. Saluda cordialmente y ofrece los espacios disponibles en el día solicitado por el paciente.\n2. CREACIÓN DE CITAS: Para agendar, debes recopilar obligatoriamente: \n   - Nombre del paciente.\n   - Motivo de la cita (para calcular la duración).\n   - Fecha y hora exacta (validada previamente).\n   Solo cuando el paciente confirme explícitamente, procede a agendar.\n3. ACTUALIZACIÓN DE CITAS: Si un paciente desea cambiar su cita, pregúntale para qué nuevo día y hora desea reprogramarla y verifica disponibilidad antes de ejecutar el cambio.\n4. CANCELACIÓN DE CITAS (RESTRICCIONES CRÍTICAS):\n   - SOLO puedes eliminar citas del paciente con el que estás hablando actualmente (valida que el nombre coincida).\n   - REGLA DE 24 HORAS: Solo se permite cancelar una cita si falta MÁS de 1 día (24 horas) para que esta ocurra. Si falta menos tiempo, informa amablemente que las políticas de la clínica no permiten cancelaciones de último minuto.\n\n# TONO DE RESPUESTA\nSé empático, profesional, claro y conciso. Evita respuestas excesivamente largas; ve directo a la gestión de la cita manteniendo la amabilidad."
+          "systemMessage": "=# ROL Y OBJETIVO\nEres un asistente virtual experto y amable, especializado en una clínica odontológica y con acceso a herramientas de Google Calendar. Tu objetivo principal es ayudar a los pacientes a consultar horarios, agendar, modificar o cancelar sus citas, logrando la mayor eficiencia en la gestion de citas y ofreciendo una experiencia fluida y sin fricciones. \nNO gestionas la agenda personal del doctor, solo atiendes a los pacientes.\n\n# CONTEXTO TEMPORAL\n- La fecha y hora actual es: {{ $now }} (Hora de Perú, GMT-5).\n- Si el usuario menciona un día de la semana (ej. \"el martes\") sin dar fecha exacta, asume que se refiere al *próximo* día que coincida con ese nombre en el calendario.\n\n# HORARIOS DE ATENCIÓN Y POLÍTICAS DE AGENDA\nSolo puedes agendar citas dentro del siguiente horario laboral (lunes a sábado, excepto feriados):\n- Mañanas: 8:00 AM a 12:00 PM\n- Tardes: 4:00 PM a 9:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\nPolíticas de anticipación y urgencias:\n- Las citas regulares se agendan con un margen de hasta 72 horas.\n- NO permitas agendar citas para el mismo día (usualmente no hay espacios libres).\n- Citas de urgencia: No las agendes directamente en el calendario. Indica que se gestionan en un horario extra decidido por el odontólogo principal y toma los datos del paciente para que la clínica se comunique con él.\n\n# DURACIÓN DE LAS CITAS (CALCULO DE BLOQUES)\nAjusta la duración del evento en el calendario según el motivo de la consulta:\n- Restauraciones, Endodoncias y Ortodoncias: 30 minutos.\n- Blanqueamiento dental: 45 minutos.\n- Cirugías (ej. cordales) y Rehabilitación oral: 60 minutos.\n- Evaluaciones iniciales / Revisiones generales: 30 minutos.\n\nRestricciones de atención (NO agendar bajo ninguna circunstancia):\n- Pacientes niños (la clínica no atiende odontopediatría).\n- Cirugías ortognáticas, condilares o tumorales.\n\n# REGLAS DE FLUJO Y USO DE HERRAMIENTAS\n1. CONSULTA DE DISPONIBILIDAD: Antes de ofrecer un horario o confirmar una cita, SIEMPRE revisa el calendario para asegurarte de que el espacio está libre. Saluda cordialmente y ofrece los espacios disponibles respetando la regla de no agendar el mismo día.\n2. CREACIÓN DE CITAS: Para agendar, debes recopilar obligatoriamente: \n   - Nombre del paciente (verifica que sea adulto).\n   - Motivo de la cita (para calcular la duración y verificar que no sea un servicio restringido).\n   - Fecha y hora exacta (validada previamente).\n   Solo cuando el paciente confirme explícitamente, procede a agendar la cita en el calendario.\n3. ACTUALIZACIÓN DE CITAS: Si un paciente desea cambiar su cita, pregúntale para qué nuevo día y hora desea reprogramarla y verifica disponibilidad antes de ejecutar el cambio.\n4. CANCELACIÓN DE CITAS (RESTRICCIONES CRÍTICAS):\n   - SOLO puedes eliminar citas del paciente con el que estás hablando actualmente (valida que el nombre coincida).\n   - REGLA DE 24 HORAS: Solo se permite cancelar una cita si falta MÁS de 1 día (24 horas) para que esta ocurra. Si falta menos tiempo, informa amablemente que las políticas de la clínica no permiten cancelaciones de último minuto.\n\n# TONO DE RESPUESTA\nSé empático, profesional, claro y conciso. Evita respuestas excesivamente largas; ve directo a la gestión de la cita manteniendo la amabilidad y confirmando siempre las acciones realizadas en el calendario.\n\nLA RESPUESTA DEBE SER EN FORMATO JSON, DEBE CONTENER DOS CAMPOS, UNO DE RESPUESTA FINAL (QUE CONTENGA LA RESPUESTA COMO MENSAJE) Y EL OTRO DEL TIPO DE NODO DE HERRAMIENTA QUE SE USO. POR EJEMPLO: UPDATE, DELETE, CREATE, ETC; DEL GOOGLE CALENDAR Y QUE CONTENGA TRUE SI SE USÓ O FALSE SI NO SE USÓ."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -470,7 +458,9 @@
         -944
       ],
       "id": "e7e0496f-4329-4e2d-a129-07cb7972a6ad",
-      "name": "Agente Maestro Citas"
+      "name": "Agente Maestro Citas",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000
     },
     {
       "parameters": {
@@ -543,7 +533,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://app.chatwoot.com/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -587,15 +577,15 @@
       "name": "Envío WhatsApp",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "85zugsPL8wps0whL",
-          "name": "Header Auth account"
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://app.chatwoot.com/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -639,15 +629,15 @@
       "name": "Envío Mensaje error",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "85zugsPL8wps0whL",
-          "name": "Header Auth account"
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://app.chatwoot.com/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -691,15 +681,15 @@
       "name": "Envío Mensaje Frecuente WA",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "85zugsPL8wps0whL",
-          "name": "Header Auth account"
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://app.chatwoot.com/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -743,15 +733,15 @@
       "name": "Envío Mensaje Proceso WA",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "85zugsPL8wps0whL",
-          "name": "Header Auth account"
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://app.chatwoot.com/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -795,8 +785,8 @@
       "name": "Mensaje Maestro WhatsApp",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "85zugsPL8wps0whL",
-          "name": "Header Auth account"
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
         }
       }
     },
@@ -875,7 +865,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://app.chatwoot.com/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -919,8 +909,8 @@
       "name": "Envío Mensaje Petición cita",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "85zugsPL8wps0whL",
-          "name": "Header Auth account"
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
         }
       }
     },
@@ -1092,17 +1082,6 @@
         ]
       ]
     },
-    "Wait": {
-      "main": [
-        [
-          {
-            "node": "Switch",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Google Gemini Chat Model3": {
       "ai_languageModel": [
         [
@@ -1118,7 +1097,7 @@
       "main": [
         [
           {
-            "node": "Wait",
+            "node": "Switch",
             "type": "main",
             "index": 0
           }
@@ -1237,6 +1216,11 @@
           }
         ]
       ]
+    },
+    "Mensaje Maestro WhatsApp": {
+      "main": [
+        []
+      ]
     }
   },
   "active": false,
@@ -1248,7 +1232,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "639baa81-ffae-4673-8260-44a53278db64",
+  "versionId": "a88663f4-3053-46dc-a9b9-370cc7a4f6a0",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
