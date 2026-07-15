@@ -160,6 +160,29 @@
                 ],
                 "combinator": "and"
               }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cc6d8328-0c00-4f6f-be46-165f06e645ec",
+                    "leftValue": "={{ $('Agente Clasificador De Intenciones').item.json.output }}",
+                    "rightValue": "consulta de productos",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
             }
           ]
         },
@@ -182,8 +205,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
-        304,
-        -272
+        576,
+        -304
       ],
       "id": "0682e2e4-207c-4b13-9f76-60660bee146b",
       "name": "Google Gemini Chat Model1",
@@ -223,8 +246,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        448,
-        -272
+        720,
+        -304
       ],
       "id": "6e2f27f4-480d-45ba-825f-25514d42c54c",
       "name": "Postgres Chat Memory2",
@@ -402,8 +425,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
-        416,
-        64
+        864,
+        -16
       ],
       "id": "e194c409-7694-41f9-b5da-14e28070021a",
       "name": "Google Gemini Chat Model3",
@@ -419,7 +442,7 @@
         "promptType": "define",
         "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
         "options": {
-          "systemMessage": "# ROL Y OBJETIVO\nEres un experto en clasificación de intenciones para un sistema automatizado de una clínica odontológica. Tu tarea es analizar el ÚLTIMO mensaje del usuario, teniendo en cuenta el historial de la conversación, para determinar en qué estado se encuentra.\n\n# REGLAS DE CLASIFICACIÓN ESTRICTA\nTu respuesta debe ser ÚNICA Y EXCLUSIVAMENTE una de las siguientes 5 opciones (sin comillas, sin puntos finales y en minúsculas). Analiza el texto según estas definiciones:\n\n* inicio de cita: El usuario saluda, pide información inicial para agendar o solicita un turno por primera vez, pero el sistema AÚN NO le ha ofrecido fechas ni le ha pedido sus datos personales.\n* proceso de cita: El usuario está continuando un agendamiento que ya está en marcha. Úsalo cuando el usuario proporciona datos que el sistema le acaba de pedir (ej. \"Mi nombre es Juan y quiero una revisión general\"), cuando confirma un horario propuesto, o cuando propone otra hora dentro de una negociación de turnos.\n* preguntas frecuentes: El usuario pregunta sobre tratamientos, precios, ubicación, horarios o si atienden casos específicos, SIN confirmar un agendamiento en ese momento.\n* comunicar humano: El usuario pide explícitamente hablar con el doctor, administración, un asesor humano, o menciona una emergencia médica grave.\n* no cita: El usuario envía mensajes irrelevantes, audios vacíos, despedidas simples (\"gracias, adiós\") o temas fuera del contexto odontológico.\n* consulta de cita: El usuario pregunta explícitamente cuándo es su próxima cita, a qué hora le toca ir, qué citas tiene programadas o pide que le recuerden su horario."
+          "systemMessage": "# ROL Y OBJETIVO\nEres un experto en clasificación de intenciones para un sistema automatizado de una clínica odontológica. Tu tarea es analizar el ÚLTIMO mensaje del usuario, teniendo en cuenta el historial de la conversación, para determinar en qué estado se encuentra.\n\n# REGLAS DE CLASIFICACIÓN ESTRICTA\nTu respuesta debe ser ÚNICA Y EXCLUSIVAMENTE una de las siguientes 5 opciones (sin comillas, sin puntos finales y en minúsculas). Analiza el texto según estas definiciones:\n\n* inicio de cita: El usuario saluda, pide información inicial para agendar o solicita un turno por primera vez, pero el sistema AÚN NO le ha ofrecido fechas ni le ha pedido sus datos personales.\n* proceso de cita: El usuario está continuando un agendamiento que ya está en marcha. Úsalo cuando el usuario proporciona datos que el sistema le acaba de pedir (ej. \"Mi nombre es Juan y quiero una revisión general\"), cuando confirma un horario propuesto, o cuando propone otra hora dentro de una negociación de turnos.\n* preguntas frecuentes: El usuario pregunta sobre tratamientos, precios, ubicación, horarios o si atienden casos específicos, SIN confirmar un agendamiento en ese momento.\n* comunicar humano: El usuario pide explícitamente hablar con el doctor, administración, un asesor humano, o menciona una emergencia médica grave.\n* no cita: El usuario envía mensajes irrelevantes, audios vacíos, despedidas simples (\"gracias, adiós\") o temas fuera del contexto odontológico.\n* consulta de cita: El usuario pregunta explícitamente cuándo es su próxima cita, a qué hora le toca ir, qué citas tiene programadas o pide que le recuerden su horario.\n* consulta de productos: El usuario pregunta explícitamente por artículos físicos a la venta (ej. cepillos, cremas, alineadores, kits de limpieza) o stock de implementos que el doctor comercializa en la clínica."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -443,8 +466,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        416,
-        -128
+        864,
+        -208
       ],
       "id": "0519cf23-98eb-4cbb-9a96-b35b3b11fc3e",
       "name": "Agente FAQ"
@@ -460,8 +483,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        320,
-        -464
+        592,
+        -496
       ],
       "id": "66a20e6e-785e-4357-83d6-fa1a9061a82e",
       "name": "Agente de proceso"
@@ -471,7 +494,7 @@
         "promptType": "define",
         "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
         "options": {
-          "systemMessage": "=# ROL Y OBJETIVO\nEres un asistente virtual experto y amable, especializado en una clínica odontológica y con acceso a herramientas de Google Calendar. Tu objetivo principal es ayudar a los pacientes a consultar horarios, agendar, modificar o cancelar sus citas, logrando la mayor eficiencia en la gestion de citas y ofreciendo una experiencia fluida y sin fricciones. \nNO gestionas la agenda personal del doctor, solo atiendes a los pacientes.\n\n# CONTEXTO TEMPORAL\n- La fecha y hora actual es: {{ $now }} (Hora de Perú, GMT-5).\n- Si el usuario menciona un día de la semana (ej. \"el martes\") sin dar fecha exacta, asume que se refiere al *próximo* día que coincida con ese nombre en el calendario.\n\n# HORARIOS DE ATENCIÓN Y POLÍTICAS DE AGENDA\nSolo puedes agendar citas dentro del siguiente horario laboral (lunes a sábado, excepto feriados):\n- Mañanas: 8:00 AM a 12:00 PM\n- Tardes: 4:00 PM a 9:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\nPolíticas de anticipación y urgencias:\n- Las citas regulares se agendan con un margen de hasta 72 horas.\n- NO permitas agendar citas para el mismo día (usualmente no hay espacios libres).\n- Citas de urgencia: No las agendes directamente en el calendario. Indica que se gestionan en un horario extra decidido por el odontólogo principal y toma los datos del paciente para que la clínica se comunique con él.\n\n# DURACIÓN DE LAS CITAS (CALCULO DE BLOQUES)\nAjusta la duración del evento en el calendario según el motivo de la consulta:\n- Restauraciones, Endodoncias y Ortodoncias: 30 minutos.\n- Blanqueamiento dental: 45 minutos.\n- Cirugías (ej. cordales) y Rehabilitación oral: 60 minutos.\n- Evaluaciones iniciales / Revisiones generales: 30 minutos.\n\nRestricciones de atención (NO agendar bajo ninguna circunstancia):\n- Pacientes niños (la clínica no atiende odontopediatría).\n- Cirugías ortognáticas, condilares o tumorales.\n\n# REGLAS DE FLUJO Y USO DE HERRAMIENTAS\n1. CONSULTA DE DISPONIBILIDAD: Antes de ofrecer un horario o confirmar una cita, SIEMPRE revisa el calendario para asegurarte de que el espacio está libre. Saluda cordialmente y ofrece los espacios disponibles respetando la regla de no agendar el mismo día.\n2. CREACIÓN DE CITAS: Para agendar, debes recopilar obligatoriamente: \n   - Nombre del paciente (verifica que sea adulto).\n   - Motivo de la cita (para calcular la duración y verificar que no sea un servicio restringido).\n   - Fecha y hora exacta (validada previamente).\n   Solo cuando el paciente confirme explícitamente, procede a agendar la cita en el calendario.\n3. ACTUALIZACIÓN DE CITAS: Si un paciente desea cambiar su cita, pregúntale por el motivo de cita, nuevo día y hora desea reprogramarla y verifica disponibilidad antes de ejecutar el cambio. Deben estar esos datos, si no estan todos no se puede continuar con la actualización.\n4. CANCELACIÓN DE CITAS (RESTRICCIONES CRÍTICAS):\n   - SOLO puedes eliminar citas del paciente con el que estás hablando actualmente (valida que el nombre coincida).\n   - REGLA DE 24 HORAS: Solo se permite cancelar una cita si falta MÁS de 1 día (24 horas) para que esta ocurra. Si falta menos tiempo, informa amablemente que las políticas de la clínica no permiten cancelaciones de último minuto.\n5. BÚSQUEDA OBLIGATORIA PARA CAMBIOS/CANCELACIONES: Si el paciente quiere reprogramar o cancelar una cita y NO tienes el ID del evento en tu memoria reciente, DEBES usar la herramienta \"Get many events in Google Calendar\" para buscar los próximos eventos y encontrar la cita a nombre del paciente. Una vez que encuentres el evento y su ID, procede a actualizarlo o cancelarlo.\n\n# TONO DE RESPUESTA\nSé empático, profesional, claro y conciso. Evita respuestas excesivamente largas; ve directo a la gestión de la cita manteniendo la amabilidad y confirmando siempre las acciones realizadas en el calendario.\n\n# FORMATO DE RESPUESTA OBLIGATORIO\nTu respuesta final DEBE ser única y exclusivamente un objeto JSON válido, sin formato Markdown (no uses ```json), sin texto introductorio y sin despedidas fuera del JSON.\n\nDebes analizar las acciones que tomaste con las herramientas de Google Calendar en este turno y generar el JSON con la siguiente estructura exacta:\n\n{\n  \"mensaje_paciente\": \"Aquí redactas la respuesta empática y natural que leerá el paciente en WhatsApp.\",\n  \"accion_realizada\": \"VALOR\",\n  \"datos_cita\": {\n    \"nombre_paciente\": \"Nombre del paciente o null\",\n    \"fecha_hora\": \"YYYY-MM-DD HH:mm o null\",\n    \"motivo_consulta\": \"Motivo resumido o null\",\n    \"google_event_id\": \"Si usaste Calendar, pon el ID del evento aquí. Si no, null\"\n  }\n}\n\nReglas para el campo \"accion_realizada\":\n- Usa \"CREATE\" si acabas de agendar una cita nueva.\n- Usa \"UPDATE\" si acabas de reprogramar una cita existente.\n- Usa \"DELETE\" si acabas de cancelar una cita.\n- Usa \"NONE\" si solo consultaste disponibilidad, si el usuario no confirmó, o si respondiste una duda general."
+          "systemMessage": "=# ROL Y OBJETIVO\nEres un asistente virtual experto y amable, especializado en una clínica odontológica y con acceso a herramientas de Google Calendar. Tu objetivo principal es ayudar a los pacientes a consultar horarios, agendar, modificar o cancelar sus citas, logrando la mayor eficiencia en la gestion de citas y ofreciendo una experiencia fluida y sin fricciones. \nNO gestionas la agenda personal del doctor, solo atiendes a los pacientes.\n\n# CONTEXTO TEMPORAL\n- La fecha y hora actual es: {{ $now }} (Hora de Perú, GMT-5).\n- Si el usuario menciona un día de la semana (ej. \"el martes\") sin dar fecha exacta, asume que se refiere al *próximo* día que coincida con ese nombre en el calendario.\n\n# HORARIOS DE ATENCIÓN Y POLÍTICAS DE AGENDA\nSolo puedes agendar citas dentro del siguiente horario laboral (lunes a sábado, excepto feriados):\n- Mañanas: 8:00 AM a 12:00 PM\n- Tardes: 4:00 PM a 9:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\nPolíticas de anticipación y urgencias:\n- Las citas regulares se agendan con un margen de hasta 72 horas.\n- NO permitas agendar citas para el mismo día (usualmente no hay espacios libres).\n- Citas de urgencia: No las agendes directamente en el calendario. Indica que se gestionan en un horario extra decidido por el odontólogo principal y toma los datos del paciente para que la clínica se comunique con él.\n\n# DURACIÓN DE LAS CITAS (CALCULO DE BLOQUES)\nAjusta la duración del evento en el calendario según el motivo de la consulta:\n- Restauraciones, Endodoncias y Ortodoncias: 30 minutos.\n- Blanqueamiento dental: 45 minutos.\n- Cirugías (ej. cordales) y Rehabilitación oral: 60 minutos.\n- Evaluaciones iniciales / Revisiones generales: 30 minutos.\n\nRestricciones de atención (NO agendar bajo ninguna circunstancia):\n- Pacientes niños (la clínica no atiende odontopediatría).\n- Cirugías ortognáticas, condilares o tumorales.\n\n# REGLAS DE FLUJO Y USO DE HERRAMIENTAS\n1. CONSULTA DE DISPONIBILIDAD: Antes de ofrecer un horario o confirmar una cita, SIEMPRE revisa el calendario para asegurarte de que el espacio está libre. Saluda cordialmente y ofrece los espacios disponibles respetando la regla de no agendar el mismo día.\n2. CREACIÓN DE CITAS: Para agendar, debes recopilar: \n   - Nombre del paciente (verifica que sea adulto - Obligatorio).\n   - Motivo de la cita (para calcular la duración y verificar que no sea un servicio restringido - Obligatorio).\n   - Fecha y hora exacta (validada previamente - Obligatorio).\n   - Correo electrónico (Opcional). Justo antes de pedirle la confirmación final para agendar, pregúntale amablemente si desea proporcionar su correo electrónico para recibir recordatorios.\n   Solo cuando el paciente confirme explícitamente la cita (y haya respondido sobre el correo, ya sea dándolo o declinando), procede a agendarla en el calendario.\n3. ACTUALIZACIÓN DE CITAS: Si un paciente desea cambiar su cita, pregúntale por el motivo de cita, nuevo día y hora desea reprogramarla y verifica disponibilidad antes de ejecutar el cambio. Deben estar esos datos, si no estan todos no se puede continuar con la actualización.\n4. CANCELACIÓN DE CITAS (RESTRICCIONES CRÍTICAS):\n   - SOLO puedes eliminar citas del paciente con el que estás hablando actualmente (valida que el nombre coincida).\n   - REGLA DE 24 HORAS: Solo se permite cancelar una cita si falta MÁS de 1 día (24 horas) para que esta ocurra. Si falta menos tiempo, informa amablemente que las políticas de la clínica no permiten cancelaciones de último minuto.\n5. BÚSQUEDA OBLIGATORIA PARA CAMBIOS/CANCELACIONES: Si el paciente quiere reprogramar o cancelar una cita y NO tienes el ID del evento en tu memoria reciente, DEBES usar la herramienta \"Get many events in Google Calendar\" para buscar los próximos eventos y encontrar la cita a nombre del paciente. Una vez que encuentres el evento y su ID, procede a actualizarlo o cancelarlo.\n\n# TONO DE RESPUESTA\nSé empático, profesional, claro y conciso. Evita respuestas excesivamente largas; ve directo a la gestión de la cita manteniendo la amabilidad y confirmando siempre las acciones realizadas en el calendario.\n\n# FORMATO DE RESPUESTA OBLIGATORIO\nTu respuesta final DEBE ser única y exclusivamente un objeto JSON válido, sin formato Markdown (no uses ```json), sin texto introductorio y sin despedidas fuera del JSON.\n\nDebes analizar las acciones que tomaste con las herramientas de Google Calendar en este turno y generar el JSON con la siguiente estructura exacta:\n\n{\n  \"mensaje_paciente\": \"Aquí redactas la respuesta empática y natural que leerá el paciente en WhatsApp.\",\n  \"accion_realizada\": \"VALOR\",\n  \"datos_cita\": {\n    \"nombre_paciente\": \"Nombre del paciente o null\",\n    \"correo_electronico\": \"Correo electrónico del paciente si lo proporcionó, o null si no lo quiso dar\",\n    \"fecha_hora\": \"YYYY-MM-DD HH:mm o null\",\n    \"motivo_consulta\": \"Motivo resumido o null\",\n    \"google_event_id\": \"Si usaste Calendar, pon el ID del evento aquí. Si no, null\"\n  }\n}\n\nReglas para el campo \"accion_realizada\":\n- Usa \"CREATE\" si acabas de agendar una cita nueva.\n- Usa \"UPDATE\" si acabas de reprogramar una cita existente.\n- Usa \"DELETE\" si acabas de cancelar una cita.\n- Usa \"NONE\" si solo consultaste disponibilidad, si el usuario no confirmó, o si respondiste una duda general."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -697,8 +720,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        784,
-        -128
+        1232,
+        -208
       ],
       "id": "7b6cc7bc-0ad0-410f-87fd-a6b3b84281c6",
       "name": "Envío Mensaje Frecuente WA",
@@ -749,8 +772,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        640,
-        -448
+        912,
+        -480
       ],
       "id": "275903bd-0258-44ea-9563-fe1254c15e9e",
       "name": "Envío Mensaje Proceso WA",
@@ -872,8 +895,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        16,
-        -96
+        464,
+        -176
       ],
       "id": "63d7dd78-af21-4e4d-bf01-e0a915671495",
       "name": "SOLICITUD HUMANO",
@@ -925,8 +948,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        128,
-        -352
+        400,
+        -384
       ],
       "id": "76ce3677-cf47-4f68-80c9-eac7661cacba",
       "name": "Envío Mensaje Petición cita",
@@ -1111,7 +1134,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// 1. Obtenemos el texto crudo que devolvió el Agente\nlet rawOutput = $input.first().json.output || \"\";\n\n// 2. Limpiamos cualquier rastro de Markdown que el LLM haya podido agregar por error\nlet cleanedOutput = rawOutput.replace(/```json/g, '').replace(/```/g, '').trim();\n\ntry {\n  // 3. Convertimos el texto en un objeto JSON procesable\n  const parsedData = JSON.parse(cleanedOutput);\n  \n  // Retornamos los datos limpios para que los siguientes nodos los usen\n  return { json: parsedData };\n\n} catch (error) {\n  // 4. Mecanismo de seguridad: Si el LLM alucinó y no dio un JSON válido, \n  // enviamos un mensaje de error al paciente y evitamos que el flujo falle críticamente.\n  return {\n    json: {\n      \"mensaje_paciente\": \"Tuvimos un pequeño inconveniente procesando tu solicitud en el sistema. ¿Podrías confirmarme tu requerimiento nuevamente?\",\n      \"accion_realizada\": \"NONE\",\n      \"datos_cita\": null,\n      \"error_interno\": error.message\n    }\n  };\n}"
+        "jsCode": "// 1. Obtenemos el texto crudo que devolvió el Agente\nlet rawOutput = $input.first().json.output || \"\";\n\n// 2. Limpiamos cualquier rastro de Markdown que el LLM haya podido agregar por error\nlet cleanedOutput = rawOutput.replace(/```json/g, '').replace(/```/g, '').trim();\n\ntry {\n  // 3. Convertimos el texto en un objeto JSON procesable\n  const parsedData = JSON.parse(cleanedOutput);\n  \n  // 4. (NUEVO) Aseguramos que la estructura de datos_cita esté completa.\n  // Si la IA olvidó el campo del correo, lo forzamos a null para evitar errores en los siguientes nodos.\n  if (parsedData.datos_cita) {\n      parsedData.datos_cita.correo_electronico = parsedData.datos_cita.correo_electronico || null;\n  }\n  \n  // Retornamos los datos limpios para que los siguientes nodos los usen\n  return { json: parsedData };\n\n} catch (error) {\n  // 5. Mecanismo de seguridad: Si el LLM alucinó y no dio un JSON válido, \n  // enviamos un mensaje de error al paciente y evitamos que el flujo falle críticamente.\n  return {\n    json: {\n      \"mensaje_paciente\": \"Tuvimos un pequeño inconveniente procesando tu solicitud en el sistema. ¿Podrías confirmarme tu requerimiento nuevamente?\",\n      \"accion_realizada\": \"NONE\",\n      \"datos_cita\": {\n        \"nombre_paciente\": null,\n        \"correo_electronico\": null,\n        \"fecha_hora\": null,\n        \"motivo_consulta\": null,\n        \"google_event_id\": null\n      },\n      \"error_interno\": error.message\n    }\n  };\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1323,7 +1346,8 @@
             "updated_at": "={{ $now }}",
             "google_event_id": "={{ $('Modificador a json').item.json.datos_cita.google_event_id }}",
             "estado_cita": "CREADA",
-            "motivo_consulta": "={{ $('Modificador a json').item.json.datos_cita.motivo_consulta }}"
+            "motivo_consulta": "={{ $('Modificador a json').item.json.datos_cita.motivo_consulta }}",
+            "correo_electronico": "={{ $('Modificador a json').item.json.datos_cita.correo_electronico }}"
           },
           "matchingColumns": [
             "id"
@@ -1402,6 +1426,26 @@
               "display": true,
               "type": "dateTime",
               "canBeUsedToMatch": true
+            },
+            {
+              "id": "detalles_notas_cita",
+              "displayName": "detalles_notas_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "correo_electronico",
+              "displayName": "correo_electronico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
             }
           ],
           "attemptToConvertTypes": false,
@@ -1445,7 +1489,8 @@
             "fecha_hora_cita": "={{ $('Modificador a json').item.json.datos_cita.fecha_hora ? DateTime.fromFormat($('Modificador a json').item.json.datos_cita.fecha_hora.replace('T', ' '), 'yyyy-MM-dd HH:mm', { zone: 'America/Lima' }).toISO() : undefined }}",
             "motivo_consulta": "={{ $('Modificador a json').item.json.datos_cita.motivo_consulta }}",
             "estado_cita": "REPROGRAMADA",
-            "updated_at": "={{ $now }}"
+            "updated_at": "={{ $now }}",
+            "correo_electronico": "={{ $('Modificador a json').item.json.datos_cita.correo_electronico }}"
           },
           "matchingColumns": [
             "google_event_id"
@@ -1528,6 +1573,26 @@
               "defaultMatch": false,
               "display": true,
               "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "detalles_notas_cita",
+              "displayName": "detalles_notas_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "correo_electronico",
+              "displayName": "correo_electronico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
               "canBeUsedToMatch": true,
               "removed": false
             }
@@ -1654,6 +1719,26 @@
               "display": true,
               "type": "dateTime",
               "canBeUsedToMatch": true
+            },
+            {
+              "id": "detalles_notas_cita",
+              "displayName": "detalles_notas_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "correo_electronico",
+              "displayName": "correo_electronico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
             }
           ],
           "attemptToConvertTypes": false,
@@ -1716,8 +1801,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        576,
-        272
+        976,
+        160
       ],
       "id": "4338ed18-2dec-4067-bab7-22324d5e6f13",
       "name": "Envío Mensaje Consulta Citas",
@@ -1736,8 +1821,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
-        96,
-        432
+        496,
+        320
       ],
       "id": "e3b955d3-837e-434e-8b52-d8c38b8bd919",
       "name": "Google Gemini Chat Model5",
@@ -1758,8 +1843,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        288,
-        480
+        688,
+        368
       ],
       "id": "597e880f-79ea-40f1-b145-470ed0ec8df1",
       "name": "Postgres Chat Memory3",
@@ -1781,8 +1866,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        176,
-        256
+        576,
+        144
       ],
       "id": "2442ca04-c2e4-4038-8ef1-f1509ffe6387",
       "name": "Agente consultor de citas"
@@ -1823,8 +1908,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -48,
-        80
+        352,
+        -32
       ],
       "id": "7ad6eeeb-4aa3-4e2b-89e2-1a268eb85f91",
       "name": "Consulta de citas",
@@ -1876,11 +1961,99 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        208,
-        -48
+        656,
+        -128
       ],
       "id": "a4a57167-aac8-4a11-bd5c-9ef0729af305",
       "name": "Envío Mensaje SOLICITUD HUMANO",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
+        "options": {
+          "systemMessage": "# ROL Y OBJETIVO\nEres el Asesor Comercial y de Farmacia de una prestigiosa clínica odontológica. Tu objetivo principal es informar a los pacientes sobre los productos físicos, kits de higiene y accesorios dentales que el doctor tiene disponibles para la venta directa en la clínica.\n\n# CATÁLOGO DE PRODUCTOS Y PRECIOS (Stock Disponible)\n\n## 1. Kits y Cuidado Diario\n* **Kit de Ortodoncia Premium (S/ 45.00):** Ideal para pacientes con brackets. Incluye cepillo viajero, cera de ortodoncia, cepillos interdentales (3 medidas), enhebradores e hilo dental especial.\n* **Pasta Dental Desensibilizante Clínica (S/ 35.00):** Fórmula de alta concentración no disponible en farmacias regulares. Recomendada para uso post-blanqueamiento o sensibilidad extrema.\n* **Tabletas Efervescentes Limpiadoras (S/ 50.00):** Caja con 30 tabletas. Para la limpieza profunda y desinfección de férulas de bruxismo, alineadores invisibles o prótesis removibles.\n\n## 2. Tecnología Dental\n* **Cepillo Eléctrico Sónico Avanzado (S/ 250.00):** Batería recargable, temporizador inteligente de 2 minutos y 3 modos de cepillado. Incluye 2 cabezales de repuesto.\n* **Irrigador Bucal Portátil (Water Flosser) (S/ 180.00):** Reemplazo perfecto o complemento del hilo dental. Ideal para limpiar puentes, implantes y brackets. Tanque de 300ml y carga USB.\n\n# REGLAS DE COMPORTAMIENTO (CONSTRAINTS)\n1. **Límites de tu rol:** Eres un experto en estos productos. Si el paciente intenta agendar una cita o pregunta por un procedimiento médico (como el costo de una extracción), indícale amablemente que tu función es asesorar sobre los productos a la venta, pero que puedes transferir su consulta al área de citas si lo desea.\n2. **Métodos de entrega:** Todos los productos se recogen y pagan presencialmente en la recepción de la clínica. No hacemos envíos por delivery.\n3. **Formato:** Sé muy conciso. Usa viñetas para listar opciones si el paciente pide recomendaciones. Evita respuestas robóticas o bloques de texto densos.\n4. **Cierre de ventas:** Siempre termina tu mensaje con una pregunta que invite a la acción, por ejemplo: \"Si deseas algún producto puedes acercarte a la clínica y pedirlo\" o \"¿Te gustaría saber más detalles sobre alguno en particular?\"."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -48,
+        80
+      ],
+      "id": "508907a1-29ee-42f9-8852-b25aa13ab462",
+      "name": "Agente de Productos"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -96,
+        304
+      ],
+      "id": "f93476fb-9d7a-497a-ad18-605fafd02803",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "wqIh4jmMGJQ1PNQx",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            },
+            {
+              "name": "private",
+              "value": "false"
+            },
+            {
+              "name": "content_type",
+              "value": "text"
+            },
+            {
+              "name": "content_attributes",
+              "value": "{}"
+            },
+            {
+              "name": "campaign_id",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        272,
+        176
+      ],
+      "id": "d13ff3bc-7a6b-4c2f-a904-6bc5c60e06ca",
+      "name": "Envío Mensaje Consulta Productos",
       "credentials": {
         "httpHeaderAuth": {
           "id": "7gsQR2AvGZtq7Dwx",
@@ -1942,6 +2115,13 @@
         [
           {
             "node": "Consulta de citas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agente de Productos",
             "type": "main",
             "index": 0
           }
@@ -2328,6 +2508,28 @@
           }
         ]
       ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente de Productos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente de Productos": {
+      "main": [
+        [
+          {
+            "node": "Envío Mensaje Consulta Productos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -2339,7 +2541,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "4e28968b-5d65-4446-8600-0cafd9f9c32c",
+  "versionId": "60f569a2-7fa0-4bcb-bfd5-31eb946c1570",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
