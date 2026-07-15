@@ -1678,6 +1678,117 @@
     },
     {
       "parameters": {
+        "method": "POST",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            },
+            {
+              "name": "private",
+              "value": "false"
+            },
+            {
+              "name": "content_type",
+              "value": "text"
+            },
+            {
+              "name": "content_attributes",
+              "value": "{}"
+            },
+            {
+              "name": "campaign_id",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        576,
+        272
+      ],
+      "id": "4338ed18-2dec-4067-bab7-22324d5e6f13",
+      "name": "Envío Mensaje Consulta Citas",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        432
+      ],
+      "id": "e3b955d3-837e-434e-8b52-d8c38b8bd919",
+      "name": "Google Gemini Chat Model5",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "wqIh4jmMGJQ1PNQx",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.phone_number }}",
+        "tableName": "mensajes_whatsapp",
+        "contextWindowLength": 3
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        288,
+        480
+      ],
+      "id": "597e880f-79ea-40f1-b145-470ed0ec8df1",
+      "name": "Postgres Chat Memory3",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Aquí están los registros de la base de datos en formato JSON para este paciente:\n{{ JSON.stringify($input.all().map(item => item.json)) }}",
+        "options": {
+          "systemMessage": "# ROL Y OBJETIVO\nEres el asistente virtual de una clínica odontológica. El sistema acaba de buscar en la base de datos el historial de citas del paciente y te proporcionará los datos crudos.\n\n# INSTRUCCIÓN CRÍTICA DE ZONA HORARIA\nLas fechas que recibirás están en formato UTC (terminan en Z). Como la clínica está en Perú (GMT-5), DEBES restarle exactamente 5 horas a la \"fecha_hora_cita\" antes de decírsela al paciente. Por ejemplo, si el dato dice 23:00:00Z, al paciente le debes decir que su cita es a las 6:00 PM.\n\n# REGLAS DE RESPUESTA\n1. Si todas las citas tienen estado \"CANCELADA\" o recibes un JSON vacío, responde amablemente que actualmente no tiene ninguna cita programada y pregúntale si desea agendar una evaluación inicial.\n2. Si hay citas con estado \"CREADA\" o \"REPROGRAMADA\" (ignora los duplicados si tienen la misma hora y motivo), redacta un mensaje muy amable, empático y directo informándole la fecha, la hora local correcta y el motivo de su cita.\n3. No menciones el ID de la base de datos, el google_event_id, ni lenguaje técnico.\n4. Devuelve ÚNICAMENTE el texto final que el paciente leerá en WhatsApp, sin comillas adicionales ni bloques markdown."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        176,
+        256
+      ],
+      "id": "2442ca04-c2e4-4038-8ef1-f1509ffe6387",
+      "name": "Agente consultor de citas"
+    },
+    {
+      "parameters": {
         "operation": "select",
         "schema": {
           "__rl": true,
@@ -1716,105 +1827,12 @@
         80
       ],
       "id": "7ad6eeeb-4aa3-4e2b-89e2-1a268eb85f91",
-      "name": "Select rows from a table",
+      "name": "Consulta de citas",
+      "alwaysOutputData": true,
       "credentials": {
         "postgres": {
           "id": "FGxUBlWatrrLsrJI",
           "name": "Postgres account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "content",
-              "value": "={{ $json.text }}"
-            },
-            {
-              "name": "message_type",
-              "value": "outgoing"
-            },
-            {
-              "name": "private",
-              "value": "false"
-            },
-            {
-              "name": "content_type",
-              "value": "text"
-            },
-            {
-              "name": "content_attributes",
-              "value": "{}"
-            },
-            {
-              "name": "campaign_id",
-              "value": "1"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        416,
-        256
-      ],
-      "id": "4338ed18-2dec-4067-bab7-22324d5e6f13",
-      "name": "Envío Mensaje Consulta Citas",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "7gsQR2AvGZtq7Dwx",
-          "name": "Header Auth account CHATWOOT AUTOALOJADO"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=Aquí están los registros de la base de datos en formato JSON para este paciente:\n{{ JSON.stringify($input.all().map(item => item.json)) }}",
-        "messages": {
-          "messageValues": [
-            {
-              "message": "=# ROL Y OBJETIVO\nEres el asistente virtual de una clínica odontológica. El sistema acaba de buscar en la base de datos el historial de citas del paciente y te proporcionará los datos crudos.\n\n# INSTRUCCIÓN CRÍTICA DE ZONA HORARIA\nLas fechas que recibirás están en formato UTC (terminan en Z). Como la clínica está en Perú (GMT-5), DEBES restarle exactamente 5 horas a la \"fecha_hora_cita\" antes de decírsela al paciente. Por ejemplo, si el dato dice 23:00:00Z, al paciente le debes decir que su cita es a las 6:00 PM.\n\n# REGLAS DE RESPUESTA\n1. Si todas las citas tienen estado \"CANCELADA\" o recibes un JSON vacío, responde amablemente que actualmente no tiene ninguna cita programada y pregúntale si desea agendar una evaluación inicial.\n2. Si hay citas con estado \"CREADA\" o \"REPROGRAMADA\" (ignora los duplicados si tienen la misma hora y motivo), redacta un mensaje muy amable, empático y directo informándole la fecha, la hora local correcta y el motivo de su cita.\n3. No menciones el ID de la base de datos, el google_event_id, ni lenguaje técnico.\n4. Devuelve ÚNICAMENTE el texto final que el paciente leerá en WhatsApp, sin comillas adicionales ni bloques markdown."
-            }
-          ]
-        },
-        "batching": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.chainLlm",
-      "typeVersion": 1.9,
-      "position": [
-        96,
-        240
-      ],
-      "id": "3f3dc807-6b5b-4f2d-9550-a4434ac41212",
-      "name": "Basic LLM Chain"
-    },
-    {
-      "parameters": {
-        "modelName": "models/gemini-3.1-flash-lite",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1.1,
-      "position": [
-        96,
-        432
-      ],
-      "id": "e3b955d3-837e-434e-8b52-d8c38b8bd919",
-      "name": "Google Gemini Chat Model5",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "wqIh4jmMGJQ1PNQx",
-          "name": "Google Gemini(PaLM) Api account"
         }
       }
     }
@@ -1871,7 +1889,7 @@
         ],
         [
           {
-            "node": "Select rows from a table",
+            "node": "Consulta de citas",
             "type": "main",
             "index": 0
           }
@@ -2204,33 +2222,44 @@
         ]
       ]
     },
-    "Select rows from a table": {
-      "main": [
-        [
-          {
-            "node": "Basic LLM Chain",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Google Gemini Chat Model5": {
       "ai_languageModel": [
         [
           {
-            "node": "Basic LLM Chain",
+            "node": "Agente consultor de citas",
             "type": "ai_languageModel",
             "index": 0
           }
         ]
       ]
     },
-    "Basic LLM Chain": {
+    "Postgres Chat Memory3": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente consultor de citas",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente consultor de citas": {
       "main": [
         [
           {
             "node": "Envío Mensaje Consulta Citas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consulta de citas": {
+      "main": [
+        [
+          {
+            "node": "Agente consultor de citas",
             "type": "main",
             "index": 0
           }
@@ -2247,7 +2276,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "1afc9290-d15c-4088-b045-3fc3b2c3dcb2",
+  "versionId": "3a14d978-a898-486f-88dd-af836d2ccc4b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
