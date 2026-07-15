@@ -55,19 +55,21 @@ docker run -d \
 
 ## 🚀 Despliegue en Render (Render Blueprints)
 
-Puedes desplegar la infraestructura completa de n8n (el servicio web más la base de datos PostgreSQL 18 dedicada) utilizando el archivo `render.yaml` incluido en la raíz de este repositorio.
+Para desplegar la infraestructura de n8n en Render (el servicio web junto con la base de datos PostgreSQL 18 dedicada), **solo es necesario el archivo `render.yaml`** en tu repositorio de GitHub. 
 
 ### Servicios Creados por el Blueprint:
-1. **`n8n-db`**: Base de datos de PostgreSQL 18 gestionada por Render.
-2. **`n8n-service`**: Servicio Web basado en el contenedor Docker oficial de n8n (`nightly-038d2ca`), configurado para conectarse de forma nativa e interna a `n8n-db`.
+1. **`n8n-db`**: Base de datos de PostgreSQL 18 gestionada y hospedada en Render.
+2. **`n8n-service`**: Servicio Web de n8n basado en la imagen Docker oficial (`nightly-038d2ca`), configurado para conectarse internamente a `n8n-db`.
 
 ### Instrucciones de Despliegue:
 
-1. Asegúrate de subir este repositorio (con los archivos `render.yaml`, `FlujoWhatsAppN8N.json` y `FlujoRecordatoriosAutomaticosN8N.json`) a tu cuenta de **GitHub**.
+1. Asegúrate de tener este repositorio con el archivo `render.yaml` en tu cuenta de **GitHub**.
 2. Ingresa a tu panel de **Render**.
 3. Haz clic en **New** (Nuevo) y selecciona **Blueprint**.
-4. Conecta tu repositorio de GitHub que contiene este proyecto.
-5. Render leerá automáticamente el archivo `render.yaml` y te mostrará la configuración lista para desplegar.
-6. Haz clic en **Apply** (Aplicar). 
-
-Render creará la base de datos PostgreSQL, autogenerará de forma segura la clave `N8N_ENCRYPTION_KEY`, y arrancará el contenedor de n8n en el puerto `5678` conectándolos automáticamente mediante variables de entorno del sistema.
+4. Conecta tu repositorio de GitHub. Render detectará automáticamente el archivo `render.yaml`.
+5. Haz clic en **Apply** (Aplicar) para iniciar el aprovisionamiento de la base de datos y de n8n.
+6. Una vez completado el despliegue:
+   * Abre la URL pública provista por Render para tu servicio de n8n.
+   * Crea o ingresa con tu cuenta de propietario en la plataforma.
+   * Importa manualmente los archivos JSON de los flujos (`FlujoWhatsAppN8N.json` y `FlujoRecordatoriosAutomaticosN8N.json`) desde la interfaz de n8n.
+   * Configura las credenciales necesarias (Google Calendar, Gmail, PostgreSQL, Chatwoot) dentro de cada flujo importado para iniciar las pruebas y ajustes del sistema.
