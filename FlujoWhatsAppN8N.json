@@ -1345,9 +1345,10 @@
             "fecha_hora_cita": "={{ $('Modificador a json').item.json.datos_cita.fecha_hora ? DateTime.fromFormat($('Modificador a json').item.json.datos_cita.fecha_hora.replace('T', ' '), 'yyyy-MM-dd HH:mm', { zone: 'America/Lima' }).toISO() : undefined }}",
             "updated_at": "={{ $now }}",
             "google_event_id": "={{ $('Modificador a json').item.json.datos_cita.google_event_id }}",
-            "estado_cita": "CREADA",
+            "estado_cita": "AGENDADA",
             "motivo_consulta": "={{ $('Modificador a json').item.json.datos_cita.motivo_consulta }}",
-            "correo_electronico": "={{ $('Modificador a json').item.json.datos_cita.correo_electronico }}"
+            "correo_electronico": "={{ $('Modificador a json').item.json.datos_cita.correo_electronico }}",
+            "recordatorio_enviado": false
           },
           "matchingColumns": [
             "id"
@@ -1435,7 +1436,7 @@
               "display": true,
               "type": "string",
               "canBeUsedToMatch": true,
-              "removed": false
+              "removed": true
             },
             {
               "id": "correo_electronico",
@@ -1444,6 +1445,16 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "recordatorio_enviado",
+              "displayName": "recordatorio_enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
               "canBeUsedToMatch": true,
               "removed": false
             }
@@ -2573,7 +2584,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "710bb958-dd7e-49ac-a709-7f928ae9f96f",
+  "versionId": "e84984c0-fe06-413c-9b31-d080712b972f",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
