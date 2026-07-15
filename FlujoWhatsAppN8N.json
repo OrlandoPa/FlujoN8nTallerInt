@@ -448,7 +448,7 @@
         "promptType": "define",
         "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
         "options": {
-          "systemMessage": "=# ROL Y OBJETIVO\nEres un asistente virtual experto y amable, especializado en una clínica odontológica y con acceso a herramientas de Google Calendar. Tu objetivo principal es ayudar a los pacientes a consultar horarios, agendar, modificar o cancelar sus citas, logrando la mayor eficiencia en la gestion de citas y ofreciendo una experiencia fluida y sin fricciones. \nNO gestionas la agenda personal del doctor, solo atiendes a los pacientes.\n\n# CONTEXTO TEMPORAL\n- La fecha y hora actual es: {{ $now }} (Hora de Perú, GMT-5).\n- Si el usuario menciona un día de la semana (ej. \"el martes\") sin dar fecha exacta, asume que se refiere al *próximo* día que coincida con ese nombre en el calendario.\n\n# HORARIOS DE ATENCIÓN Y POLÍTICAS DE AGENDA\nSolo puedes agendar citas dentro del siguiente horario laboral (lunes a sábado, excepto feriados):\n- Mañanas: 8:00 AM a 12:00 PM\n- Tardes: 4:00 PM a 9:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\nPolíticas de anticipación y urgencias:\n- Las citas regulares se agendan con un margen de hasta 72 horas.\n- NO permitas agendar citas para el mismo día (usualmente no hay espacios libres).\n- Citas de urgencia: No las agendes directamente en el calendario. Indica que se gestionan en un horario extra decidido por el odontólogo principal y toma los datos del paciente para que la clínica se comunique con él.\n\n# DURACIÓN DE LAS CITAS (CALCULO DE BLOQUES)\nAjusta la duración del evento en el calendario según el motivo de la consulta:\n- Restauraciones, Endodoncias y Ortodoncias: 30 minutos.\n- Blanqueamiento dental: 45 minutos.\n- Cirugías (ej. cordales) y Rehabilitación oral: 60 minutos.\n- Evaluaciones iniciales / Revisiones generales: 30 minutos.\n\nRestricciones de atención (NO agendar bajo ninguna circunstancia):\n- Pacientes niños (la clínica no atiende odontopediatría).\n- Cirugías ortognáticas, condilares o tumorales.\n\n# REGLAS DE FLUJO Y USO DE HERRAMIENTAS\n1. CONSULTA DE DISPONIBILIDAD: Antes de ofrecer un horario o confirmar una cita, SIEMPRE revisa el calendario para asegurarte de que el espacio está libre. Saluda cordialmente y ofrece los espacios disponibles respetando la regla de no agendar el mismo día.\n2. CREACIÓN DE CITAS: Para agendar, debes recopilar obligatoriamente: \n   - Nombre del paciente (verifica que sea adulto).\n   - Motivo de la cita (para calcular la duración y verificar que no sea un servicio restringido).\n   - Fecha y hora exacta (validada previamente).\n   Solo cuando el paciente confirme explícitamente, procede a agendar la cita en el calendario.\n3. ACTUALIZACIÓN DE CITAS: Si un paciente desea cambiar su cita, pregúntale para qué nuevo día y hora desea reprogramarla y verifica disponibilidad antes de ejecutar el cambio.\n4. CANCELACIÓN DE CITAS (RESTRICCIONES CRÍTICAS):\n   - SOLO puedes eliminar citas del paciente con el que estás hablando actualmente (valida que el nombre coincida).\n   - REGLA DE 24 HORAS: Solo se permite cancelar una cita si falta MÁS de 1 día (24 horas) para que esta ocurra. Si falta menos tiempo, informa amablemente que las políticas de la clínica no permiten cancelaciones de último minuto.\n\n# TONO DE RESPUESTA\nSé empático, profesional, claro y conciso. Evita respuestas excesivamente largas; ve directo a la gestión de la cita manteniendo la amabilidad y confirmando siempre las acciones realizadas en el calendario.\n\nLA RESPUESTA DEBE SER EN FORMATO JSON, DEBE CONTENER DOS CAMPOS, UNO DE RESPUESTA FINAL (QUE CONTENGA LA RESPUESTA COMO MENSAJE) Y EL OTRO DEL TIPO DE NODO DE HERRAMIENTA QUE SE USO. POR EJEMPLO: UPDATE, DELETE, CREATE, ETC; DEL GOOGLE CALENDAR Y QUE CONTENGA TRUE SI SE USÓ O FALSE SI NO SE USÓ."
+          "systemMessage": "=# ROL Y OBJETIVO\nEres un asistente virtual experto y amable, especializado en una clínica odontológica y con acceso a herramientas de Google Calendar. Tu objetivo principal es ayudar a los pacientes a consultar horarios, agendar, modificar o cancelar sus citas, logrando la mayor eficiencia en la gestion de citas y ofreciendo una experiencia fluida y sin fricciones. \nNO gestionas la agenda personal del doctor, solo atiendes a los pacientes.\n\n# CONTEXTO TEMPORAL\n- La fecha y hora actual es: {{ $now }} (Hora de Perú, GMT-5).\n- Si el usuario menciona un día de la semana (ej. \"el martes\") sin dar fecha exacta, asume que se refiere al *próximo* día que coincida con ese nombre en el calendario.\n\n# HORARIOS DE ATENCIÓN Y POLÍTICAS DE AGENDA\nSolo puedes agendar citas dentro del siguiente horario laboral (lunes a sábado, excepto feriados):\n- Mañanas: 8:00 AM a 12:00 PM\n- Tardes: 4:00 PM a 9:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\nPolíticas de anticipación y urgencias:\n- Las citas regulares se agendan con un margen de hasta 72 horas.\n- NO permitas agendar citas para el mismo día (usualmente no hay espacios libres).\n- Citas de urgencia: No las agendes directamente en el calendario. Indica que se gestionan en un horario extra decidido por el odontólogo principal y toma los datos del paciente para que la clínica se comunique con él.\n\n# DURACIÓN DE LAS CITAS (CALCULO DE BLOQUES)\nAjusta la duración del evento en el calendario según el motivo de la consulta:\n- Restauraciones, Endodoncias y Ortodoncias: 30 minutos.\n- Blanqueamiento dental: 45 minutos.\n- Cirugías (ej. cordales) y Rehabilitación oral: 60 minutos.\n- Evaluaciones iniciales / Revisiones generales: 30 minutos.\n\nRestricciones de atención (NO agendar bajo ninguna circunstancia):\n- Pacientes niños (la clínica no atiende odontopediatría).\n- Cirugías ortognáticas, condilares o tumorales.\n\n# REGLAS DE FLUJO Y USO DE HERRAMIENTAS\n1. CONSULTA DE DISPONIBILIDAD: Antes de ofrecer un horario o confirmar una cita, SIEMPRE revisa el calendario para asegurarte de que el espacio está libre. Saluda cordialmente y ofrece los espacios disponibles respetando la regla de no agendar el mismo día.\n2. CREACIÓN DE CITAS: Para agendar, debes recopilar obligatoriamente: \n   - Nombre del paciente (verifica que sea adulto).\n   - Motivo de la cita (para calcular la duración y verificar que no sea un servicio restringido).\n   - Fecha y hora exacta (validada previamente).\n   Solo cuando el paciente confirme explícitamente, procede a agendar la cita en el calendario.\n3. ACTUALIZACIÓN DE CITAS: Si un paciente desea cambiar su cita, pregúntale para qué nuevo día y hora desea reprogramarla y verifica disponibilidad antes de ejecutar el cambio.\n4. CANCELACIÓN DE CITAS (RESTRICCIONES CRÍTICAS):\n   - SOLO puedes eliminar citas del paciente con el que estás hablando actualmente (valida que el nombre coincida).\n   - REGLA DE 24 HORAS: Solo se permite cancelar una cita si falta MÁS de 1 día (24 horas) para que esta ocurra. Si falta menos tiempo, informa amablemente que las políticas de la clínica no permiten cancelaciones de último minuto.\n\n# TONO DE RESPUESTA\nSé empático, profesional, claro y conciso. Evita respuestas excesivamente largas; ve directo a la gestión de la cita manteniendo la amabilidad y confirmando siempre las acciones realizadas en el calendario.\n\n# FORMATO DE RESPUESTA OBLIGATORIO\nTu respuesta final DEBE ser única y exclusivamente un objeto JSON válido, sin formato Markdown (no uses ```json), sin texto introductorio y sin despedidas fuera del JSON.\n\nDebes analizar las acciones que tomaste con las herramientas de Google Calendar en este turno y generar el JSON con la siguiente estructura exacta:\n\n{\n  \"mensaje_paciente\": \"Aquí redactas la respuesta empática y natural que leerá el paciente en WhatsApp.\",\n  \"accion_realizada\": \"VALOR\",\n  \"datos_cita\": {\n    \"nombre_paciente\": \"Nombre extraído de la conversación o null\",\n    \"fecha_hora\": \"YYYY-MM-DD HH:mm o null\"\n  }\n}\n\nReglas para el campo \"accion_realizada\":\n- Usa \"CREATE\" si acabas de agendar una cita nueva.\n- Usa \"UPDATE\" si acabas de reprogramar una cita existente.\n- Usa \"DELETE\" si acabas de cancelar una cita.\n- Usa \"NONE\" si solo consultaste disponibilidad, si el usuario no confirmó, o si respondiste una duda general."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -749,7 +749,7 @@
           "parameters": [
             {
               "name": "content",
-              "value": "={{ $json.output }}"
+              "value": "={{ $('Code in JavaScript').item.json.mensaje_paciente }}"
             },
             {
               "name": "message_type",
@@ -778,8 +778,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        448,
-        -976
+        1024,
+        -688
       ],
       "id": "f38c1e0a-e418-426d-84f4-20633de6736e",
       "name": "Mensaje Maestro WhatsApp",
@@ -929,6 +929,582 @@
       "id": "492d31f3-4a45-41a4-b4f0-a6f603e28806",
       "name": "Trigger Mensaje WhatsApp",
       "webhookId": "2cc8a1c3-38fc-4eac-be0e-536dc1011783"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Obtenemos el texto crudo que devolvió el Agente\nlet rawOutput = $input.first().json.output || \"\";\n\n// 2. Limpiamos cualquier rastro de Markdown que el LLM haya podido agregar por error\nlet cleanedOutput = rawOutput.replace(/```json/g, '').replace(/```/g, '').trim();\n\ntry {\n  // 3. Convertimos el texto en un objeto JSON procesable\n  const parsedData = JSON.parse(cleanedOutput);\n  \n  // Retornamos los datos limpios para que los siguientes nodos los usen\n  return { json: parsedData };\n\n} catch (error) {\n  // 4. Mecanismo de seguridad: Si el LLM alucinó y no dio un JSON válido, \n  // enviamos un mensaje de error al paciente y evitamos que el flujo falle críticamente.\n  return {\n    json: {\n      \"mensaje_paciente\": \"Tuvimos un pequeño inconveniente procesando tu solicitud en el sistema. ¿Podrías confirmarme tu requerimiento nuevamente?\",\n      \"accion_realizada\": \"NONE\",\n      \"datos_cita\": null,\n      \"error_interno\": error.message\n    }\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        -1008
+      ],
+      "id": "aa67eccf-dc62-4406-84bd-43f721f77176",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.accion_realizada }}",
+                    "rightValue": "CREATE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "abd4992d-d79f-4873-b81f-f85fa4bb237e"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "19095603-1070-40dd-864f-34ce37d4f3a8",
+                    "leftValue": "={{ $json.accion_realizada }}",
+                    "rightValue": "UPDATE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1c20ba90-b10e-4689-9072-5e4f567c3dd5",
+                    "leftValue": "={{ $json.accion_realizada }}",
+                    "rightValue": "DELETE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3dd06a39-c76b-4242-be8a-6d29792932e8",
+                    "leftValue": "={{ $json.accion_realizada }}",
+                    "rightValue": "NONE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        -1056
+      ],
+      "id": "9a3031b7-5acc-4c21-a079-16baf030727e",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "pacientes",
+          "mode": "list",
+          "cachedResultName": "pacientes"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "telefono_whatsapp",
+              "value": "={{ $('Trigger Mensaje WhatsApp').item.json.body.conversation.messages[0].sender.phone_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1072,
+        -848
+      ],
+      "id": "80ce759c-e8bb-46c3-b506-6164aad46556",
+      "name": "Delete table or rows",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "pacientes",
+          "mode": "list",
+          "cachedResultName": "pacientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telefono_whatsapp": "={{ $('Trigger Mensaje WhatsApp').item.json.body.conversation.messages[0].sender.phone_number }}",
+            "nombre_paciente": "={{ $('Code in JavaScript').item.json.datos_cita.nombre_paciente }}",
+            "created_at": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "telefono_whatsapp",
+              "displayName": "telefono_whatsapp",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nombre_paciente",
+              "displayName": "nombre_paciente",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1120,
+        -1040
+      ],
+      "id": "0cf94d72-23b2-4ada-b212-718e04c3c071",
+      "name": "Insert or update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "pacientes",
+          "mode": "list",
+          "cachedResultName": "pacientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "created_at": "={{ $now }}",
+            "nombre_paciente": "={{ $('Code in JavaScript').item.json.datos_cita.nombre_paciente }}",
+            "telefono_whatsapp": "={{ $('Trigger Mensaje WhatsApp').item.json.body.conversation.messages[0].sender.phone_number }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "telefono_whatsapp",
+              "displayName": "telefono_whatsapp",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nombre_paciente",
+              "displayName": "nombre_paciente",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1040,
+        -1200
+      ],
+      "id": "d111e3ce-a616-41a6-a933-5430484ebf80",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "citas",
+          "mode": "list",
+          "cachedResultName": "citas"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telefono_paciente": "={{ $('Trigger Mensaje WhatsApp').item.json.body.conversation.messages[0].sender.phone_number }}",
+            "fecha_hora_cita": "={{ $('Code in JavaScript').item.json.datos_cita.fecha_hora }}",
+            "created_at": "=",
+            "updated_at": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "telefono_paciente",
+              "displayName": "telefono_paciente",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_hora_cita",
+              "displayName": "fecha_hora_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "motivo_consulta",
+              "displayName": "motivo_consulta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado_cita",
+              "displayName": "estado_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "google_event_id",
+              "displayName": "google_event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1248,
+        -1200
+      ],
+      "id": "5a29914f-a352-44c3-b49d-36f51f5e87bd",
+      "name": "Insert rows in a table1",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "citas",
+          "mode": "list",
+          "cachedResultName": "citas"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha_hora_cita": "={{ $('Code in JavaScript').item.json.datos_cita.fecha_hora }}",
+            "updated_at": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "telefono_paciente",
+              "displayName": "telefono_paciente",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "fecha_hora_cita",
+              "displayName": "fecha_hora_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "motivo_consulta",
+              "displayName": "motivo_consulta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "estado_cita",
+              "displayName": "estado_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "google_event_id",
+              "displayName": "google_event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1328,
+        -1040
+      ],
+      "id": "952633c2-27de-47b4-82c8-5d3699fc2e30",
+      "name": "Insert or update rows in a table1",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "citas",
+          "mode": "list",
+          "cachedResultName": "citas"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "telefono_paciente",
+              "value": "={{ $('Trigger Mensaje WhatsApp').item.json.body.sender.phone_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1280,
+        -848
+      ],
+      "id": "31217212-ee0f-4149-b55e-dbb89feaa515",
+      "name": "Delete table or rows1",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -1137,7 +1713,7 @@
       "main": [
         [
           {
-            "node": "Mensaje Maestro WhatsApp",
+            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
@@ -1221,6 +1797,82 @@
       "main": [
         []
       ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete table or rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensaje Maestro WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert or update rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete table or rows": {
+      "main": [
+        [
+          {
+            "node": "Delete table or rows1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -1232,7 +1884,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "a88663f4-3053-46dc-a9b9-370cc7a4f6a0",
+  "versionId": "45fb4fae-6edc-4a7f-ad42-18de3794aac0",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
