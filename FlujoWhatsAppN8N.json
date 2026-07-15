@@ -3,24 +3,6 @@
   "nodes": [
     {
       "parameters": {
-        "promptType": "define",
-        "text": "={{ $json.message.text }}",
-        "options": {
-          "systemMessage": "Eres un experto en gestion de intenciones para la gestion de horarios en una clinica odontologia. Debes clasificar si desea una cita en el horario u otra cosa. Tu respuesta debe ser UNICAMENTE: \"inicio de cita\", \"proceso de cita\" o \"no cita\" "
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
-      "position": [
-        -592,
-        -288
-      ],
-      "id": "8184e173-61d5-43f5-b881-5d4331759118",
-      "name": "AI Agent",
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
         "modelName": "models/gemini-3.1-flash-lite",
         "options": {}
       },
@@ -28,7 +10,7 @@
       "typeVersion": 1.1,
       "position": [
         -624,
-        0
+        -48
       ],
       "id": "f70a3409-ec39-4d21-aa96-76e9a4100f8a",
       "name": "Google Gemini Chat Model",
@@ -121,7 +103,7 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $('AI Agent').item.json.output }}",
+                    "leftValue": "={{ $('Agente Clasificador De Intenciones').item.json.output }}",
                     "rightValue": "inicio de cita",
                     "operator": {
                       "type": "string",
@@ -144,11 +126,57 @@
                 "conditions": [
                   {
                     "id": "f9c3cb8e-4915-4fde-a731-f7c8b5ceee15",
-                    "leftValue": "={{ $('AI Agent').item.json.output }}",
+                    "leftValue": "={{ $('Agente Clasificador De Intenciones').item.json.output }}",
                     "rightValue": "no cita",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "03303bdd-81fa-4f79-82ce-fa7a2dc896fd",
+                    "leftValue": "={{ $('Agente Clasificador De Intenciones').item.json.output }}",
+                    "rightValue": "preguntas frecuentes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "daa6c69d-299a-41d2-af7b-9ea65f465a25",
+                    "leftValue": "={{ $('Agente Clasificador De Intenciones').item.json.output }}",
+                    "rightValue": "comunicar humano",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
                     }
                   }
                 ],
@@ -177,8 +205,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -32,
-        96
+        112,
+        -352
       ],
       "id": "212c6b9f-9bec-4abc-a375-65146051e3de",
       "name": "Send a text message1",
@@ -192,31 +220,14 @@
     },
     {
       "parameters": {
-        "promptType": "define",
-        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
-        "options": {
-          "systemMessage": "=Eres un experto gestor de citas de horarios\nLa fecha y hora actual es: {{ $now }}, hora peruana.\nComo se está empezando la cita debes saludar y preguntar para que fecha desea la cita\n\n\n"
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
-      "position": [
-        208,
-        -128
-      ],
-      "id": "69725d3a-1748-475b-8bf3-df17d21262ff",
-      "name": "AI Agent1"
-    },
-    {
-      "parameters": {
         "modelName": "models/gemini-3.1-flash-lite",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
-        192,
-        96
+        304,
+        -272
       ],
       "id": "f216134e-129b-4589-962f-3bc945c646bf",
       "name": "Google Gemini Chat Model1",
@@ -236,8 +247,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        544,
-        -112
+        656,
+        -480
       ],
       "id": "50d4b6d1-0336-49e9-b3f2-01c8e489354e",
       "name": "Send a text message2",
@@ -251,30 +262,13 @@
     },
     {
       "parameters": {
-        "promptType": "define",
-        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
-        "options": {
-          "systemMessage": "=# ROL Y OBJETIVO\nEres un asistente virtual experto y amable, especializado en la gestión eficiente de citas para una clínica. Tu objetivo principal es ayudar a los pacientes a consultar horarios, agendar, modificar o cancelar sus citas, ofreciendo una experiencia fluida y sin fricciones. \nNO gestionas la agenda personal del doctor, solo atiendes a los pacientes.\n\n# CONTEXTO TEMPORAL\n- La fecha y hora actual es: {{ $now }} (Hora de Perú, GMT-5).\n- Si el usuario menciona un día de la semana (ej. \"el martes\") sin dar fecha exacta, asume que se refiere al *próximo* día que coincida con ese nombre en el calendario.\n\n# HORARIOS DE ATENCIÓN Y SERVICIOS\nSolo puedes agendar citas dentro del siguiente horario laboral:\n- Mañanas: 10:00 AM a 1:00 PM\n- Tardes: 4:00 PM a 8:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\nDuración de las citas según el motivo:\n- Curación simple: 30 minutos.\n- Revisión: 15 minutos.\n- Otros motivos / Curacion general: 1 hora.\n\n# REGLAS DE FLUJO Y USO DE HERRAMIENTAS\n1. CONSULTA DE DISPONIBILIDAD: Antes de ofrecer un horario o confirmar una cita, SIEMPRE revisa el calendario para asegurarte de que el espacio está libre. Saluda cordialmente y ofrece los espacios disponibles en el día solicitado por el paciente.\n2. CREACIÓN DE CITAS: Para agendar, debes recopilar obligatoriamente: \n   - Nombre del paciente.\n   - Motivo de la cita (para calcular la duración).\n   - Fecha y hora exacta (validada previamente).\n   Solo cuando el paciente confirme explícitamente, procede a agendar.\n3. ACTUALIZACIÓN DE CITAS: Si un paciente desea cambiar su cita, pregúntale para qué nuevo día y hora desea reprogramarla y verifica disponibilidad antes de ejecutar el cambio.\n4. CANCELACIÓN DE CITAS (RESTRICCIONES CRÍTICAS):\n   - SOLO puedes eliminar citas del paciente con el que estás hablando actualmente (valida que el nombre coincida).\n   - REGLA DE 24 HORAS: Solo se permite cancelar una cita si falta MÁS de 1 día (24 horas) para que esta ocurra. Si falta menos tiempo, informa amablemente que las políticas de la clínica no permiten cancelaciones de último minuto.\n\n# TONO DE RESPUESTA\nSé empático, profesional, claro y conciso. Evita respuestas excesivamente largas; ve directo a la gestión de la cita manteniendo la amabilidad."
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
-      "position": [
-        128,
-        -656
-      ],
-      "id": "d3772c0c-2b2c-41be-91d2-178a4822a4cf",
-      "name": "AI Agent2"
-    },
-    {
-      "parameters": {
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1.1,
       "position": [
-        64,
-        -432
+        96,
+        -736
       ],
       "id": "69fcd60c-5efd-4b45-a7be-0501536d3d30",
       "name": "Google Gemini Chat Model2",
@@ -294,8 +288,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        560,
-        -736
+        576,
+        -1024
       ],
       "id": "48d37540-7e8e-49bf-8b63-6697707a988f",
       "name": "Send a text message3",
@@ -310,28 +304,6 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $json.message.from.id }}",
-        "tableName": "Mensajes",
-        "contextWindowLength": 3
-      },
-      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
-      "typeVersion": 1.3,
-      "position": [
-        -496,
-        -16
-      ],
-      "id": "d6a01bf0-6f1b-4767-bf53-ffa9c3be2306",
-      "name": "Postgres Chat Memory1",
-      "credentials": {
-        "postgres": {
-          "id": "FGxUBlWatrrLsrJI",
-          "name": "Postgres account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "sessionIdType": "customKey",
         "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
         "tableName": "Mensajes",
         "contextWindowLength": 3
@@ -339,8 +311,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        336,
-        96
+        448,
+        -272
       ],
       "id": "99e21acc-c9b9-4a28-9767-f92572e15b86",
       "name": "Postgres Chat Memory2",
@@ -361,8 +333,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        160,
-        -272
+        176,
+        -560
       ],
       "id": "3a95effd-3ce4-4178-8928-7f89b0721618",
       "name": "Postgres Chat Memory",
@@ -390,8 +362,8 @@
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
       "position": [
-        608,
-        -480
+        624,
+        -768
       ],
       "id": "2ec392d9-b012-4797-bcf6-b04065292410",
       "name": "Get many events in Google Calendar",
@@ -417,8 +389,8 @@
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
       "position": [
-        496,
-        -384
+        512,
+        -672
       ],
       "id": "419642fa-ed47-475e-a465-78e9bfc0eff5",
       "name": "Create an event in Google Calendar",
@@ -444,8 +416,8 @@
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
       "position": [
-        384,
-        -480
+        400,
+        -768
       ],
       "id": "20ecdafa-45f8-4890-9fbf-ec37bdf12f1b",
       "name": "Delete an event in Google Calendar",
@@ -471,8 +443,8 @@
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
       "position": [
-        272,
-        -384
+        288,
+        -672
       ],
       "id": "96dcecb9-d8bb-4d73-94d8-f17d68a8e8b1",
       "name": "Update an event in Google Calendar",
@@ -498,8 +470,8 @@
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
       "position": [
-        720,
-        -384
+        736,
+        -672
       ],
       "id": "973028a9-fd93-4688-b475-40c386e41faa",
       "name": "Get an event in Google Calendar",
@@ -595,14 +567,14 @@
         "sendTo": "orlandop3789@gmail.com",
         "subject": "Informe de error",
         "emailType": "text",
-        "message": "Ocurrió un error en un log, porfavor revisar",
+        "message": "=Ocurrió un error en un log, porfavor revisar.\nId: {{ $json.result.chat.id }} \nFirst Name: {{ $json.result.chat.first_name }} \nLast Name: {{ $json.result.chat.last_name }} Text: {{ $('Telegram Trigger').item.json.message.text }}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        -544,
-        208
+        -608,
+        144
       ],
       "id": "baac8c40-751d-45ed-81e0-4b06f480cd2f",
       "name": "Send a message",
@@ -619,17 +591,174 @@
         "sendTo": "orlandop3789@gmail.com",
         "subject": "Informe de error",
         "emailType": "text",
-        "message": "Ocurrió un error en un log, porfavor revisar",
+        "message": "=Ocurrió un error en un log, porfavor revisar\nTime: {{ $now }}\nId: {{ $json.result.chat.id }}\nFirst Name: {{ $json.result.chat.first_name }}\nLast Name: {{ $json.result.chat.last_name }}\nText: {{ $('Telegram Trigger').item.json.message.text }}\nId Workflow: {{ $workflow.id }}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        -288,
-        64
+        -224,
+        48
       ],
       "id": "bc6948c9-9a50-4fd5-8a2d-ca17f2a46c1a",
       "name": "Send a message1",
+      "webhookId": "6d6b09b1-c75b-46be-b239-2b041e88fbe1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ykZyOmxgngbomNSQ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        -128
+      ],
+      "id": "dbec5204-7669-4005-ba6c-eab9729f7ce7",
+      "name": "Send a text message5",
+      "webhookId": "ef3ed33b-c56a-44c6-9b7c-98d15588793b",
+      "credentials": {
+        "telegramApi": {
+          "id": "uKMNeO6a3gVwePmO",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        64
+      ],
+      "id": "c51fd882-09a9-441d-b1d5-b22e9c400478",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "wqIh4jmMGJQ1PNQx",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "Eres un experto en gestion de intenciones para la gestion de horarios en una clinica odontologia. Debes clasificar si desea una cita en el horario u otra cosa. Tu respuesta debe ser UNICAMENTE: \"inicio de cita\", \"proceso de cita\", \"no cita\", \"preguntas frecuentes\" o \"comunicar humano\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -592,
+        -288
+      ],
+      "id": "8184e173-61d5-43f5-b881-5d4331759118",
+      "name": "Agente Clasificador De Intenciones",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "=# ROL Y OBJETIVO\nEres un agente de Inteligencia Artificial especializado en atención al paciente para una clínica odontológica. \nTu objetivo principal es resolver consultas frecuentes (tratamientos y costos) de manera precisa y lograr la mayor **eficiencia en la gestion de citas**, orientando la conversación hacia la reserva de una evaluación inicial.\nLa fecha y hora actual es: {{ $now }}, hora peruana.\n\n# BASE DE CONOCIMIENTO (KNOWLEDGE BASE)\n\n## 1. Tratamientos y Servicios\n- Especialidades principales: Ortodoncia, Endodoncia y Estética.\n- Blanqueamiento dental: Tiene una duración aproximada de entre 30 y 45 minutos.\n- Cirugías: Sí se realizan cirugías de cordales (muelas del juicio).\n- Odontopediatría: Se atiende a niños, pero es un requisito indispensable que estén acompañados por sus familiares en todo momento.\n- Casos complejos: No asumas diagnósticos. Si el paciente menciona un tratamiento complejo, indica que debe ser evaluado directamente por el doctor para confirmar si es realizable.\n\n## 2. Costos y Métodos de Pago\n- Precios: Nunca proporciones montos específicos ni presupuestos exactos. El costo de cualquier tratamiento es manejado y determinado exclusivamente por el doctor bajo su criterio tras una evaluación clínica.\n- Métodos de pago preferenciales: Únicamente Yape y dinero en efectivo.\n\n# REGLAS DE COMPORTAMIENTO (CONSTRAINTS)\n1. Tono: Mantén un lenguaje empático, profesional, claro y persuasivo.\n2. Derivación a Cita: Toda respuesta relacionada con precios o tratamientos complejos debe concluir con una invitación directa a agendar una cita de evaluación.\n3. Límites: Si el usuario pregunta algo fuera del ámbito odontológico o de la clínica, responde amablemente que tu función es exclusiva para la asistencia dental.\n\n# FORMATO DE RESPUESTA ESPERADO\n- Sé conciso. No generes párrafos largos.\n- Usa listas con viñetas si debes enumerar información.\n- Termina siempre tu intervención cediéndole la palabra al usuario con una pregunta orientada a agendar la cita.\n\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        240,
+        -128
+      ],
+      "id": "819be746-6f9e-4e64-9ba4-4185b25019f9",
+      "name": "Agente FAQ"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "=Eres un experto gestor de citas de horarios\nLa fecha y hora actual es: {{ $now }}, hora peruana.\nComo se está empezando la cita debes saludar y preguntar para que fecha desea la cita\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        320,
+        -496
+      ],
+      "id": "69725d3a-1748-475b-8bf3-df17d21262ff",
+      "name": "Agente de proceso"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "=# ROL Y OBJETIVO\nEres un asistente virtual experto y amable, especializado en la gestión eficiente de citas para una clínica. Tu objetivo principal es ayudar a los pacientes a consultar horarios, agendar, modificar o cancelar sus citas, ofreciendo una experiencia fluida y sin fricciones. \nNO gestionas la agenda personal del doctor, solo atiendes a los pacientes.\n\n# CONTEXTO TEMPORAL\n- La fecha y hora actual es: {{ $now }} (Hora de Perú, GMT-5).\n- Si el usuario menciona un día de la semana (ej. \"el martes\") sin dar fecha exacta, asume que se refiere al *próximo* día que coincida con ese nombre en el calendario.\n\n# HORARIOS DE ATENCIÓN Y SERVICIOS\nSolo puedes agendar citas dentro del siguiente horario laboral:\n- Mañanas: 10:00 AM a 1:00 PM\n- Tardes: 4:00 PM a 8:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\nDuración de las citas según el motivo:\n- Curación simple: 30 minutos.\n- Revisión: 15 minutos.\n- Otros motivos / Curacion general: 1 hora.\n\n# REGLAS DE FLUJO Y USO DE HERRAMIENTAS\n1. CONSULTA DE DISPONIBILIDAD: Antes de ofrecer un horario o confirmar una cita, SIEMPRE revisa el calendario para asegurarte de que el espacio está libre. Saluda cordialmente y ofrece los espacios disponibles en el día solicitado por el paciente.\n2. CREACIÓN DE CITAS: Para agendar, debes recopilar obligatoriamente: \n   - Nombre del paciente.\n   - Motivo de la cita (para calcular la duración).\n   - Fecha y hora exacta (validada previamente).\n   Solo cuando el paciente confirme explícitamente, procede a agendar.\n3. ACTUALIZACIÓN DE CITAS: Si un paciente desea cambiar su cita, pregúntale para qué nuevo día y hora desea reprogramarla y verifica disponibilidad antes de ejecutar el cambio.\n4. CANCELACIÓN DE CITAS (RESTRICCIONES CRÍTICAS):\n   - SOLO puedes eliminar citas del paciente con el que estás hablando actualmente (valida que el nombre coincida).\n   - REGLA DE 24 HORAS: Solo se permite cancelar una cita si falta MÁS de 1 día (24 horas) para que esta ocurra. Si falta menos tiempo, informa amablemente que las políticas de la clínica no permiten cancelaciones de último minuto.\n\n# TONO DE RESPUESTA\nSé empático, profesional, claro y conciso. Evita respuestas excesivamente largas; ve directo a la gestión de la cita manteniendo la amabilidad."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        144,
+        -944
+      ],
+      "id": "d3772c0c-2b2c-41be-91d2-178a4822a4cf",
+      "name": "Agente Maestro Citas"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "tableName": "Mensajes",
+        "contextWindowLength": 3
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -496,
+        -48
+      ],
+      "id": "e7011439-f50b-4654-8019-c7b69d0947c8",
+      "name": "Postgres Chat Memory1",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "orlandop3789@gmail.com",
+        "subject": "Informe de error",
+        "emailType": "text",
+        "message": "=SE SOLICITA COMUNICACION CON UN HUMANO, porfavor revisar\nTime: {{ $now }}\nId: {{ $json.result.chat.id }}\nFirst Name: {{ $json.result.chat.first_name }}\nLast Name: {{ $json.result.chat.last_name }}\nText: {{ $('Telegram Trigger').item.json.message.text }}\nId Workflow: {{ $workflow.id }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        -80
+      ],
+      "id": "4d1ee4ce-7bf5-4c36-b123-e1fb430f6bcb",
+      "name": "Send a message2",
       "webhookId": "6d6b09b1-c75b-46be-b239-2b041e88fbe1",
       "credentials": {
         "gmailOAuth2": {
@@ -645,26 +774,8 @@
       "ai_languageModel": [
         [
           {
-            "node": "AI Agent",
+            "node": "Agente Clasificador De Intenciones",
             "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Agent": {
-      "main": [
-        [
-          {
-            "node": "Wait",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Send a text message",
-            "type": "main",
             "index": 0
           }
         ]
@@ -685,14 +796,14 @@
       "main": [
         [
           {
-            "node": "AI Agent2",
+            "node": "Agente Maestro Citas",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "AI Agent1",
+            "node": "Agente de proceso",
             "type": "main",
             "index": 0
           }
@@ -703,6 +814,20 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Agente FAQ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -710,7 +835,7 @@
       "ai_languageModel": [
         [
           {
-            "node": "AI Agent1",
+            "node": "Agente de proceso",
             "type": "ai_languageModel",
             "index": 0
           }
@@ -728,45 +853,12 @@
         ]
       ]
     },
-    "AI Agent1": {
-      "main": [
-        [
-          {
-            "node": "Send a text message2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Google Gemini Chat Model2": {
       "ai_languageModel": [
         [
           {
-            "node": "AI Agent2",
+            "node": "Agente Maestro Citas",
             "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Agent2": {
-      "main": [
-        [
-          {
-            "node": "Send a text message3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Postgres Chat Memory1": {
-      "ai_memory": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_memory",
             "index": 0
           }
         ]
@@ -776,7 +868,7 @@
       "ai_memory": [
         [
           {
-            "node": "AI Agent1",
+            "node": "Agente de proceso",
             "type": "ai_memory",
             "index": 0
           }
@@ -787,7 +879,7 @@
       "ai_memory": [
         [
           {
-            "node": "AI Agent2",
+            "node": "Agente Maestro Citas",
             "type": "ai_memory",
             "index": 0
           }
@@ -798,7 +890,7 @@
       "ai_tool": [
         [
           {
-            "node": "AI Agent2",
+            "node": "Agente Maestro Citas",
             "type": "ai_tool",
             "index": 0
           }
@@ -809,7 +901,7 @@
       "ai_tool": [
         [
           {
-            "node": "AI Agent2",
+            "node": "Agente Maestro Citas",
             "type": "ai_tool",
             "index": 0
           }
@@ -820,7 +912,7 @@
       "ai_tool": [
         [
           {
-            "node": "AI Agent2",
+            "node": "Agente Maestro Citas",
             "type": "ai_tool",
             "index": 0
           }
@@ -831,7 +923,7 @@
       "ai_tool": [
         [
           {
-            "node": "AI Agent2",
+            "node": "Agente Maestro Citas",
             "type": "ai_tool",
             "index": 0
           }
@@ -842,7 +934,7 @@
       "ai_tool": [
         [
           {
-            "node": "AI Agent2",
+            "node": "Agente Maestro Citas",
             "type": "ai_tool",
             "index": 0
           }
@@ -875,7 +967,7 @@
       "main": [
         [
           {
-            "node": "AI Agent",
+            "node": "Agente Clasificador De Intenciones",
             "type": "main",
             "index": 0
           }
@@ -899,6 +991,79 @@
           }
         ]
       ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente FAQ",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Clasificador De Intenciones": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente FAQ": {
+      "main": [
+        [
+          {
+            "node": "Send a text message5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente de proceso": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Maestro Citas": {
+      "main": [
+        [
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente Clasificador De Intenciones",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -910,7 +1075,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "7249da83-810d-4bb4-b685-314574835553",
+  "versionId": "f397434b-0151-4472-b0b2-b0e7a66830ae",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
