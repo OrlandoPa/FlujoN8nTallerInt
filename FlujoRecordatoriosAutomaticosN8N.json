@@ -1,0 +1,321 @@
+{
+  "name": "Recordatorios Automaticos",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 0,30 4-7,12-16 * * 1-6"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        32
+      ],
+      "id": "24986725-bffe-4184-8da8-e90a8df1822a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    c.id,\n    p.nombre_paciente,\n    c.correo_electronico,\n    c.motivo_consulta,\n    TO_CHAR(c.fecha_hora_cita AT TIME ZONE 'America/Lima', 'DD/MM/YYYY a las HH12:MI AM') AS fecha_hora_correo\nFROM\n    public.citas c\nINNER JOIN\n    public.pacientes p ON c.telefono_paciente = p.telefono_whatsapp\nWHERE\n    -- Crea una ventana de tolerancia de 15 minutos antes y después de las 4 horas exactas\n    c.fecha_hora_cita AT TIME ZONE 'America/Lima' BETWEEN \n        (NOW() AT TIME ZONE 'America/Lima' + INTERVAL '4 hours' - INTERVAL '15 minutes')\n        AND \n        (NOW() AT TIME ZONE 'America/Lima' + INTERVAL '4 hours' + INTERVAL '15 minutes')\n    \n    -- Filtros de estado y seguridad (ACTUALIZADO)\n    AND c.estado_cita IN ('AGENDADA', 'REPROGRAMADA')\n    AND c.recordatorio_enviado = false\n    \n    -- Validación de correo electrónico\n    AND c.correo_electronico IS NOT NULL \n    AND TRIM(c.correo_electronico) <> '';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        240,
+        32
+      ],
+      "id": "cf1faf1c-356e-438b-a028-92b7bbaf432b",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.correo_electronico }}",
+        "subject": "Recordatorio Cita Odontologica",
+        "message": "=Hola <b>{{ $json.nombre_paciente }}</b>,<br><br>\n\nTe recordamos que tienes una cita programada con nosotros.<br><br>\n\n<b>Detalles de tu cita:</b><br>\n<ul>\n  <li><b>Fecha y Hora:</b> {{ $json.fecha_hora_correo }}</li>\n  <li><b>Motivo:</b> {{ $json.motivo_consulta }}</li>\n</ul><br>\n\nPor favor, intenta llegar con 10 minutos de anticipación. ¡Te esperamos!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        32
+      ],
+      "id": "d36cb66e-257a-45c2-9323-efb752c5b703",
+      "name": "Send a message",
+      "webhookId": "11f46236-011f-4959-9a2d-ad332470cc50",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ykZyOmxgngbomNSQ",
+          "name": "Gmail account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "citas",
+          "mode": "list",
+          "cachedResultName": "citas"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "recordatorio_enviado": true,
+            "id": "={{ $('Execute a SQL query').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "telefono_paciente",
+              "displayName": "telefono_paciente",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fecha_hora_cita",
+              "displayName": "fecha_hora_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "motivo_consulta",
+              "displayName": "motivo_consulta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estado_cita",
+              "displayName": "estado_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "google_event_id",
+              "displayName": "google_event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "detalles_notas_cita",
+              "displayName": "detalles_notas_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "correo_electronico",
+              "displayName": "correo_electronico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "recordatorio_enviado",
+              "displayName": "recordatorio_enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        864,
+        32
+      ],
+      "id": "80aeee92-011b-41a1-b81a-df6a510ba909",
+      "name": "Update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d6232efb-e6ea-4f2f-b132-85435b03a49d",
+              "leftValue": "={{ $json.messageId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        656,
+        32
+      ],
+      "id": "74a2224c-ddb3-4879-97bf-1566381dc06b",
+      "name": "Filter"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "America/Lima",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "01ad8c59-6286-45fa-899c-31ff24a7e4b2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
+  },
+  "id": "6NGaIu8Zy3OPGwNm",
+  "tags": []
+}
