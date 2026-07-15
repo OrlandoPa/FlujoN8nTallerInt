@@ -7,7 +7,7 @@
           "interval": [
             {
               "field": "cronExpression",
-              "expression": "0 0,30 4-7,12-16 * * 1-6"
+              "expression": "0,30 7-10,15-19 * * 0-5"
             }
           ]
         }
@@ -24,7 +24,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT\n    c.id,\n    p.nombre_paciente,\n    c.correo_electronico,\n    c.motivo_consulta,\n    TO_CHAR(c.fecha_hora_cita AT TIME ZONE 'America/Lima', 'DD/MM/YYYY a las HH12:MI AM') AS fecha_hora_correo\nFROM\n    public.citas c\nINNER JOIN\n    public.pacientes p ON c.telefono_paciente = p.telefono_whatsapp\nWHERE\n    -- Crea una ventana de tolerancia de 15 minutos antes y después de las 4 horas exactas\n    c.fecha_hora_cita AT TIME ZONE 'America/Lima' BETWEEN \n        (NOW() AT TIME ZONE 'America/Lima' + INTERVAL '4 hours' - INTERVAL '15 minutes')\n        AND \n        (NOW() AT TIME ZONE 'America/Lima' + INTERVAL '4 hours' + INTERVAL '15 minutes')\n    \n    -- Filtros de estado y seguridad (ACTUALIZADO)\n    AND c.estado_cita IN ('AGENDADA', 'REPROGRAMADA')\n    AND c.recordatorio_enviado = false\n    \n    -- Validación de correo electrónico\n    AND c.correo_electronico IS NOT NULL \n    AND TRIM(c.correo_electronico) <> '';",
+        "query": "SELECT\n    c.id,\n    p.nombre_paciente,\n    c.correo_electronico,\n    c.motivo_consulta,\n    TO_CHAR(c.fecha_hora_cita AT TIME ZONE 'America/Lima', 'DD/MM/YYYY a las HH12:MI AM') AS fecha_hora_correo\nFROM\n    public.citas c\nINNER JOIN\n    public.pacientes p ON c.telefono_paciente = p.telefono_whatsapp\nWHERE\n    -- Crea una ventana de tolerancia de 15 minutos antes y después de las 4 horas exactas\n    c.fecha_hora_cita AT TIME ZONE 'America/Lima' BETWEEN \n        (NOW() AT TIME ZONE 'America/Lima' + INTERVAL '25 hours' - INTERVAL '15 minutes')\n        AND \n        (NOW() AT TIME ZONE 'America/Lima' + INTERVAL '25 hours' + INTERVAL '15 minutes')\n    \n    -- Filtros de estado y seguridad (ACTUALIZADO)\n    AND c.estado_cita IN ('AGENDADA', 'REPROGRAMADA')\n    AND c.recordatorio_enviado = false\n    \n    -- Validación de correo electrónico\n    AND c.correo_electronico IS NOT NULL \n    AND TRIM(c.correo_electronico) <> '';",
         "options": {}
       },
       "type": "n8n-nodes-base.postgres",
@@ -311,7 +311,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "01ad8c59-6286-45fa-899c-31ff24a7e4b2",
+  "versionId": "d31f8739-b374-4e44-ae9f-7acacc33d25c",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
