@@ -8,7 +8,8 @@ services:
   - type: web
     name: n8n-service
     runtime: image
-    image: docker.io/n8nio/n8n:nightly-038d2ca
+    image:
+      url: docker.io/n8nio/n8n:nightly-038d2ca
     plan: free
     envVars:
       - key: DB_TYPE
