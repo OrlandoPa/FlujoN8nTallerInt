@@ -749,7 +749,7 @@
           "parameters": [
             {
               "name": "content",
-              "value": "={{ $('Code in JavaScript').item.json.mensaje_paciente }}"
+              "value": "={{ $('Modificador a json').item.json.mensaje_paciente }}"
             },
             {
               "name": "message_type",
@@ -778,8 +778,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        1024,
-        -688
+        1008,
+        -640
       ],
       "id": "f38c1e0a-e418-426d-84f4-20633de6736e",
       "name": "Mensaje Maestro WhatsApp",
@@ -932,6 +932,162 @@
     },
     {
       "parameters": {
+        "method": "POST",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $('Modificador a json').item.json.mensaje_paciente }}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            },
+            {
+              "name": "private",
+              "value": "false"
+            },
+            {
+              "name": "content_type",
+              "value": "text"
+            },
+            {
+              "name": "content_attributes",
+              "value": "{}"
+            },
+            {
+              "name": "campaign_id",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1520,
+        -784
+      ],
+      "id": "c85aaa42-cae5-419b-823d-c466be636ce2",
+      "name": "Mensaje Maestro WhatsApp1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $('Modificador a json').item.json.mensaje_paciente }}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            },
+            {
+              "name": "private",
+              "value": "false"
+            },
+            {
+              "name": "content_type",
+              "value": "text"
+            },
+            {
+              "name": "content_attributes",
+              "value": "{}"
+            },
+            {
+              "name": "campaign_id",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1568,
+        -944
+      ],
+      "id": "f6c68794-ec97-4035-942b-ecb1ba8f4b07",
+      "name": "Mensaje Maestro WhatsApp2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $('Modificador a json').item.json.mensaje_paciente }}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            },
+            {
+              "name": "private",
+              "value": "false"
+            },
+            {
+              "name": "content_type",
+              "value": "text"
+            },
+            {
+              "name": "content_attributes",
+              "value": "{}"
+            },
+            {
+              "name": "campaign_id",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1536,
+        -1136
+      ],
+      "id": "477f78c4-11f9-4c0f-8c01-16a948992c4c",
+      "name": "Mensaje Maestro WhatsApp3",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7gsQR2AvGZtq7Dwx",
+          "name": "Header Auth account CHATWOOT AUTOALOJADO"
+        }
+      }
+    },
+    {
+      "parameters": {
         "jsCode": "// 1. Obtenemos el texto crudo que devolvió el Agente\nlet rawOutput = $input.first().json.output || \"\";\n\n// 2. Limpiamos cualquier rastro de Markdown que el LLM haya podido agregar por error\nlet cleanedOutput = rawOutput.replace(/```json/g, '').replace(/```/g, '').trim();\n\ntry {\n  // 3. Convertimos el texto en un objeto JSON procesable\n  const parsedData = JSON.parse(cleanedOutput);\n  \n  // Retornamos los datos limpios para que los siguientes nodos los usen\n  return { json: parsedData };\n\n} catch (error) {\n  // 4. Mecanismo de seguridad: Si el LLM alucinó y no dio un JSON válido, \n  // enviamos un mensaje de error al paciente y evitamos que el flujo falle críticamente.\n  return {\n    json: {\n      \"mensaje_paciente\": \"Tuvimos un pequeño inconveniente procesando tu solicitud en el sistema. ¿Podrías confirmarme tu requerimiento nuevamente?\",\n      \"accion_realizada\": \"NONE\",\n      \"datos_cita\": null,\n      \"error_interno\": error.message\n    }\n  };\n}"
       },
       "type": "n8n-nodes-base.code",
@@ -941,7 +1097,7 @@
         -1008
       ],
       "id": "aa67eccf-dc62-4406-84bd-43f721f77176",
-      "name": "Code in JavaScript"
+      "name": "Modificador a json"
     },
     {
       "parameters": {
@@ -1046,7 +1202,82 @@
         -1056
       ],
       "id": "9a3031b7-5acc-4c21-a079-16baf030727e",
-      "name": "Switch1"
+      "name": "Switch de BD"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "pacientes",
+          "mode": "list",
+          "cachedResultName": "pacientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telefono_whatsapp": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.phone_number }}",
+            "nombre_paciente": "={{ $('Modificador a json').item.json.datos_cita.nombre_paciente }}"
+          },
+          "matchingColumns": [
+            "telefono_whatsapp"
+          ],
+          "schema": [
+            {
+              "id": "telefono_whatsapp",
+              "displayName": "telefono_whatsapp",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nombre_paciente",
+              "displayName": "nombre_paciente",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1040,
+        -1200
+      ],
+      "id": "d111e3ce-a616-41a6-a933-5430484ebf80",
+      "name": "Upsert in row Paciente",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
     },
     {
       "parameters": {
@@ -1065,12 +1296,11 @@
           "mappingMode": "defineBelow",
           "value": {
             "telefono_paciente": "={{ $('Trigger Mensaje WhatsApp').item.json.body.conversation.messages[0].sender.phone_number }}",
-            "fecha_hora_cita": "={{ $('Code in JavaScript').item.json.datos_cita.fecha_hora }}",
-            "created_at": "={{ $now }}",
+            "fecha_hora_cita": "={{ DateTime.fromFormat($('Modificador a json').item.json.datos_cita.fecha_hora.replace('T', ' '), 'yyyy-MM-dd HH:mm', { zone: 'America/Lima' }).toISO() }}",
             "updated_at": "={{ $now }}",
-            "google_event_id": "={{ $('Code in JavaScript').item.json.datos_cita.google_event_id }}",
+            "google_event_id": "={{ $('Modificador a json').item.json.datos_cita.google_event_id }}",
             "estado_cita": "CREADA",
-            "motivo_consulta": "={{ $('Code in JavaScript').item.json.datos_cita.motivo_consulta }}"
+            "motivo_consulta": "={{ $('Modificador a json').item.json.datos_cita.motivo_consulta }}"
           },
           "matchingColumns": [
             "id"
@@ -1138,7 +1368,8 @@
               "defaultMatch": false,
               "display": true,
               "type": "dateTime",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": true
             },
             {
               "id": "updated_at",
@@ -1162,357 +1393,7 @@
         -1200
       ],
       "id": "5a29914f-a352-44c3-b49d-36f51f5e87bd",
-      "name": "Insert rows in a table1",
-      "credentials": {
-        "postgres": {
-          "id": "FGxUBlWatrrLsrJI",
-          "name": "Postgres account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "upsert",
-        "schema": {
-          "__rl": true,
-          "mode": "list",
-          "value": "public"
-        },
-        "table": {
-          "__rl": true,
-          "value": "citas",
-          "mode": "list",
-          "cachedResultName": "citas"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "fecha_hora_cita": "={{ $('Code in JavaScript').item.json.datos_cita.fecha_hora }}",
-            "updated_at": "={{ $now }}",
-            "id": 0,
-            "estado_cita": "REPROGRAMADA"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "id",
-              "displayName": "id",
-              "required": false,
-              "defaultMatch": true,
-              "display": true,
-              "type": "number",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "telefono_paciente",
-              "displayName": "telefono_paciente",
-              "required": true,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": false
-            },
-            {
-              "id": "fecha_hora_cita",
-              "displayName": "fecha_hora_cita",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "dateTime",
-              "canBeUsedToMatch": false
-            },
-            {
-              "id": "motivo_consulta",
-              "displayName": "motivo_consulta",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": false
-            },
-            {
-              "id": "estado_cita",
-              "displayName": "estado_cita",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": false
-            },
-            {
-              "id": "google_event_id",
-              "displayName": "google_event_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": false
-            },
-            {
-              "id": "created_at",
-              "displayName": "created_at",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "dateTime",
-              "canBeUsedToMatch": false
-            },
-            {
-              "id": "updated_at",
-              "displayName": "updated_at",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "dateTime",
-              "canBeUsedToMatch": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2.6,
-      "position": [
-        1120,
-        -1008
-      ],
-      "id": "952633c2-27de-47b4-82c8-5d3699fc2e30",
-      "name": "Insert or update rows in a table1",
-      "credentials": {
-        "postgres": {
-          "id": "FGxUBlWatrrLsrJI",
-          "name": "Postgres account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "content",
-              "value": "={{ $('Code in JavaScript').item.json.mensaje_paciente }}"
-            },
-            {
-              "name": "message_type",
-              "value": "outgoing"
-            },
-            {
-              "name": "private",
-              "value": "false"
-            },
-            {
-              "name": "content_type",
-              "value": "text"
-            },
-            {
-              "name": "content_attributes",
-              "value": "{}"
-            },
-            {
-              "name": "campaign_id",
-              "value": "1"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        1520,
-        -784
-      ],
-      "id": "c85aaa42-cae5-419b-823d-c466be636ce2",
-      "name": "Mensaje Maestro WhatsApp1",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "7gsQR2AvGZtq7Dwx",
-          "name": "Header Auth account CHATWOOT AUTOALOJADO"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "content",
-              "value": "={{ $('Code in JavaScript').item.json.mensaje_paciente }}"
-            },
-            {
-              "name": "message_type",
-              "value": "outgoing"
-            },
-            {
-              "name": "private",
-              "value": "false"
-            },
-            {
-              "name": "content_type",
-              "value": "text"
-            },
-            {
-              "name": "content_attributes",
-              "value": "{}"
-            },
-            {
-              "name": "campaign_id",
-              "value": "1"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        1568,
-        -944
-      ],
-      "id": "f6c68794-ec97-4035-942b-ecb1ba8f4b07",
-      "name": "Mensaje Maestro WhatsApp2",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "7gsQR2AvGZtq7Dwx",
-          "name": "Header Auth account CHATWOOT AUTOALOJADO"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "content",
-              "value": "={{ $('Code in JavaScript').item.json.mensaje_paciente }}"
-            },
-            {
-              "name": "message_type",
-              "value": "outgoing"
-            },
-            {
-              "name": "private",
-              "value": "false"
-            },
-            {
-              "name": "content_type",
-              "value": "text"
-            },
-            {
-              "name": "content_attributes",
-              "value": "{}"
-            },
-            {
-              "name": "campaign_id",
-              "value": "1"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        1536,
-        -1136
-      ],
-      "id": "477f78c4-11f9-4c0f-8c01-16a948992c4c",
-      "name": "Mensaje Maestro WhatsApp3",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "7gsQR2AvGZtq7Dwx",
-          "name": "Header Auth account CHATWOOT AUTOALOJADO"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "upsert",
-        "schema": {
-          "__rl": true,
-          "mode": "list",
-          "value": "public"
-        },
-        "table": {
-          "__rl": true,
-          "value": "pacientes",
-          "mode": "list",
-          "cachedResultName": "pacientes"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "telefono_whatsapp": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.phone_number }}",
-            "nombre_paciente": "={{ $('Code in JavaScript').item.json.datos_cita.nombre_paciente }}",
-            "created_at": "={{ $now }}"
-          },
-          "matchingColumns": [
-            "telefono_whatsapp"
-          ],
-          "schema": [
-            {
-              "id": "telefono_whatsapp",
-              "displayName": "telefono_whatsapp",
-              "required": true,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "nombre_paciente",
-              "displayName": "nombre_paciente",
-              "required": true,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": false,
-              "removed": false
-            },
-            {
-              "id": "created_at",
-              "displayName": "created_at",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "dateTime",
-              "canBeUsedToMatch": false,
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2.6,
-      "position": [
-        1040,
-        -1200
-      ],
-      "id": "d111e3ce-a616-41a6-a933-5430484ebf80",
-      "name": "Insert or update rows in a table2",
+      "name": "Insert in row Cita",
       "credentials": {
         "postgres": {
           "id": "FGxUBlWatrrLsrJI",
@@ -1537,8 +1418,12 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "id": 0,
-            "estado_cita": "CANCELADA"
+            "google_event_id": "={{ $json.datos_cita.google_event_id }}",
+            "telefono_paciente": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.phone_number }}",
+            "fecha_hora_cita": "={{ DateTime.fromFormat($('Modificador a json').item.json.datos_cita.fecha_hora.replace('T', ' '), 'yyyy-MM-dd HH:mm', { zone: 'America/Lima' }).toISO() }}",
+            "motivo_consulta": "={{ $('Modificador a json').item.json.datos_cita.motivo_consulta }}",
+            "estado_cita": "REPROGRAMADA",
+            "updated_at": "={{ $now }}"
           },
           "matchingColumns": [
             "google_event_id"
@@ -1552,7 +1437,136 @@
               "display": true,
               "type": "number",
               "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "telefono_paciente",
+              "displayName": "telefono_paciente",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
               "removed": false
+            },
+            {
+              "id": "fecha_hora_cita",
+              "displayName": "fecha_hora_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "motivo_consulta",
+              "displayName": "motivo_consulta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estado_cita",
+              "displayName": "estado_cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "google_event_id",
+              "displayName": "google_event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1120,
+        -1008
+      ],
+      "id": "952633c2-27de-47b4-82c8-5d3699fc2e30",
+      "name": "Update rows Cita",
+      "credentials": {
+        "postgres": {
+          "id": "FGxUBlWatrrLsrJI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "citas",
+          "mode": "list",
+          "cachedResultName": "citas"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estado_cita": "CANCELADA",
+            "google_event_id": "={{ $('Modificador a json').item.json.datos_cita.google_event_id }}",
+            "motivo_consulta": "={{ $('Modificador a json').item.json.datos_cita.motivo_consulta }}",
+            "telefono_paciente": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.phone_number }}",
+            "updated_at": "={{ $now }}",
+            "fecha_hora_cita": "={{ DateTime.fromFormat($('Modificador a json').item.json.datos_cita.fecha_hora.replace('T', ' '), 'yyyy-MM-dd HH:mm', { zone: 'America/Lima' }).toISO() }}"
+          },
+          "matchingColumns": [
+            "google_event_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
             },
             {
               "id": "telefono_paciente",
@@ -1607,7 +1621,8 @@
               "defaultMatch": false,
               "display": true,
               "type": "dateTime",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": true
             },
             {
               "id": "updated_at",
@@ -1631,7 +1646,7 @@
         -832
       ],
       "id": "6c0409c3-d608-4f45-80af-768078af51c6",
-      "name": "Update rows in a table",
+      "name": "SoftDelete Paciente",
       "credentials": {
         "postgres": {
           "id": "FGxUBlWatrrLsrJI",
@@ -1846,7 +1861,7 @@
       "main": [
         [
           {
-            "node": "Code in JavaScript",
+            "node": "Modificador a json",
             "type": "main",
             "index": 0
           }
@@ -1931,36 +1946,36 @@
         []
       ]
     },
-    "Code in JavaScript": {
+    "Modificador a json": {
       "main": [
         [
           {
-            "node": "Switch1",
+            "node": "Switch de BD",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Switch1": {
+    "Switch de BD": {
       "main": [
         [
           {
-            "node": "Insert or update rows in a table2",
+            "node": "Upsert in row Paciente",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Insert or update rows in a table1",
+            "node": "Update rows Cita",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Update rows in a table",
+            "node": "SoftDelete Paciente",
             "type": "main",
             "index": 0
           }
@@ -1974,7 +1989,18 @@
         ]
       ]
     },
-    "Insert rows in a table1": {
+    "Upsert in row Paciente": {
+      "main": [
+        [
+          {
+            "node": "Insert in row Cita",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert in row Cita": {
       "main": [
         [
           {
@@ -1985,7 +2011,7 @@
         ]
       ]
     },
-    "Insert or update rows in a table1": {
+    "Update rows Cita": {
       "main": [
         [
           {
@@ -1996,18 +2022,7 @@
         ]
       ]
     },
-    "Insert or update rows in a table2": {
-      "main": [
-        [
-          {
-            "node": "Insert rows in a table1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Update rows in a table": {
+    "SoftDelete Paciente": {
       "main": [
         [
           {
@@ -2028,7 +2043,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "dd6384c2-9f56-403e-8a05-3a66ceea00a0",
+  "versionId": "5d291595-364e-422c-9b87-9833267471d6",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
