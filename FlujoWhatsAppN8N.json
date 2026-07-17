@@ -971,8 +971,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -1008,
-        -464
+        -960,
+        -688
       ],
       "id": "492d31f3-4a45-41a4-b4f0-a6f603e28806",
       "name": "Trigger Mensaje WhatsApp",
@@ -1883,7 +1883,8 @@
         144
       ],
       "id": "2442ca04-c2e4-4038-8ef1-f1509ffe6387",
-      "name": "Agente consultor de citas"
+      "name": "Agente consultor de citas",
+      "executeOnce": true
     },
     {
       "parameters": {
@@ -2094,6 +2095,40 @@
           "name": "Postgres account"
         }
       }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "50285998-92e9-4b09-833c-d5e31eab3b81",
+              "leftValue": "={{ $json.body.message_type }}",
+              "rightValue": "incoming",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -960,
+        -480
+      ],
+      "id": "5ad074c0-a470-477a-8d31-50b7f2e4c888",
+      "name": "If"
     }
   ],
   "pinData": {},
@@ -2389,7 +2424,7 @@
       "main": [
         [
           {
-            "node": "Verificador Payloads",
+            "node": "If",
             "type": "main",
             "index": 0
           }
@@ -2575,6 +2610,17 @@
           }
         ]
       ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Verificador Payloads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -2586,7 +2632,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "736b7508-4f59-4600-b823-b7f768db1d58",
+  "versionId": "e6841c27-ae56-4e3d-a2eb-71b80debf788",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
