@@ -24,7 +24,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT\n    c.id,\n    p.nombre_paciente,\n    c.correo_electronico,\n    c.motivo_consulta,\n    TO_CHAR(c.fecha_hora_cita AT TIME ZONE 'America/Lima', 'DD/MM/YYYY a las HH12:MI AM') AS fecha_hora_correo\nFROM\n    public.citas c\nINNER JOIN\n    public.pacientes p ON c.telefono_paciente = p.telefono_whatsapp\nWHERE\n    -- Crea una ventana de tolerancia de 15 minutos antes y después de las 4 horas exactas\n    c.fecha_hora_cita AT TIME ZONE 'America/Lima' BETWEEN \n        (NOW() AT TIME ZONE 'America/Lima' + INTERVAL '25 hours' - INTERVAL '15 minutes')\n        AND \n        (NOW() AT TIME ZONE 'America/Lima' + INTERVAL '25 hours' + INTERVAL '15 minutes')\n    \n    -- Filtros de estado y seguridad (ACTUALIZADO)\n    AND c.estado_cita IN ('AGENDADA', 'REPROGRAMADA')\n    AND c.recordatorio_enviado = false\n    \n    -- Validación de correo electrónico\n    AND c.correo_electronico IS NOT NULL \n    AND TRIM(c.correo_electronico) <> '';",
+        "query": "SELECT\n    c.id,\n    p.nombre_paciente,\n    c.correo_electronico,\n    c.motivo_consulta,\n    TO_CHAR(c.fecha_hora_cita AT TIME ZONE 'America/Lima', 'DD/MM/YYYY a las HH12:MI AM') AS fecha_hora_correo\nFROM\n    public.citas c\nINNER JOIN\n    public.pacientes p ON c.identificador_paciente = p.identificador_paciente\nWHERE\n    -- Ventana de 15 minutos alrededor de las 24-25 horas antes de la cita\n    c.fecha_hora_cita AT TIME ZONE 'America/Lima' BETWEEN \n        (NOW() AT TIME ZONE 'America/Lima' + INTERVAL '25 hours' - INTERVAL '15 minutes')\n        AND \n        (NOW() AT TIME ZONE 'America/Lima' + INTERVAL '25 hours' + INTERVAL '15 minutes')\n    \n    -- Filtros de estado y citas pendientes de aviso\n    AND c.estado_cita IN ('AGENDADA', 'REPROGRAMADA')\n    AND c.recordatorio_enviado = false\n    \n    -- Validación de correo\n    AND c.correo_electronico IS NOT NULL \n    AND TRIM(c.correo_electronico) <> '';",
         "options": {}
       },
       "type": "n8n-nodes-base.postgres",
@@ -84,7 +84,7 @@
           "mappingMode": "defineBelow",
           "value": {
             "recordatorio_enviado": true,
-            "id": "={{ $('Execute a SQL query').item.json.id }}"
+            "id": "={{ $('Execute a SQL query').all()[$itemIndex].json.id }}"
           },
           "matchingColumns": [
             "id"
@@ -101,8 +101,8 @@
               "removed": false
             },
             {
-              "id": "telefono_paciente",
-              "displayName": "telefono_paciente",
+              "id": "identificador_paciente",
+              "displayName": "identificador_paciente",
               "required": true,
               "defaultMatch": false,
               "display": true,
@@ -197,7 +197,18 @@
               "defaultMatch": false,
               "display": true,
               "type": "boolean",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tratamiento_receta",
+              "displayName": "tratamiento_receta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
             }
           ],
           "attemptToConvertTypes": false,
@@ -232,11 +243,12 @@
           "conditions": [
             {
               "id": "d6232efb-e6ea-4f2f-b132-85435b03a49d",
-              "leftValue": "={{ $json.labelIds[0] }}",
+              "leftValue": "={{ $json.labelIds ? $json.labelIds.includes('SENT') : false }}",
               "rightValue": "SENT",
               "operator": {
-                "type": "string",
-                "operation": "equals"
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
               }
             }
           ],
@@ -310,11 +322,12 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "0cacc996-48f9-4d8a-bd88-cbb6873a5f9b",
+  "versionId": "72b3e879-ad37-4227-8c56-7aadc25e8ddf",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
   },
+  "nodeGroups": [],
   "id": "6NGaIu8Zy3OPGwNm",
   "tags": []
 }

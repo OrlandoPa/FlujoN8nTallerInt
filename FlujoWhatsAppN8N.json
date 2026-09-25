@@ -1,5 +1,5 @@
 {
-  "name": "TallerIntegrador WhatsApp",
+  "name": "GestiónCitas WhatsApp",
   "nodes": [
     {
       "parameters": {
@@ -240,7 +240,7 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.phone_number }}",
+        "sessionKey": "={{ $('Verificador Payloads').item.json.unified_sender_id }}",
         "tableName": "mensajes_whatsapp",
         "contextWindowLength": 3
       },
@@ -262,9 +262,8 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.phone_number }}",
-        "tableName": "mensajes_whatsapp",
-        "contextWindowLength": 3
+        "sessionKey": "={{ $('Verificador Payloads').item.json.unified_sender_id }}",
+        "tableName": "mensajes_whatsapp"
       },
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
@@ -369,12 +368,15 @@
         "operation": "update",
         "calendar": {
           "__rl": true,
-          "value": "automatizadon8n@gmail.com",
-          "mode": "list",
-          "cachedResultName": "automatizadon8n@gmail.com"
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Calendar', ``, 'string') }}",
+          "mode": "id",
+          "__regex": "(^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)"
         },
         "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
-        "updateFields": {}
+        "updateFields": {
+          "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+          "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}"
+        }
       },
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
@@ -443,7 +445,7 @@
         "promptType": "define",
         "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
         "options": {
-          "systemMessage": "Eres un analizador de texto estricto diseñado para el enrutamiento lógico de un flujo de automatización. Tu única función es la clasificación de intenciones para una clínica odontológica.\n\nREGLA DE ORO: El sistema fallará si tu respuesta contiene algo más que una de las siguientes etiquetas exactas. NO saludes, NO des explicaciones, NO uses puntuación. Devuelve SOLO LA ETIQUETA.\n\nOPCIONES VÁLIDAS (Elige solo una):\ninicio de cita\nproceso de cita\npreguntas frecuentes\ncomunicar humano\nno cita\nconsulta de cita\nconsulta de productos\n\nDEFINICIONES:\n- inicio de cita: Saludo, pide información inicial para agendar o solicita turno por primera vez (el sistema AÚN NO ofrece fechas ni pide datos).\n- proceso de cita: Continúa un agendamiento en marcha (da datos pedidos, confirma horario, propone otra hora).\n- preguntas frecuentes: Pregunta tratamientos, precios, ubicación, horarios, casos específicos (SIN confirmar agendamiento).\n- comunicar humano: Pide hablar con el doctor, administración, asesor o reporta emergencia.\n- no cita: Mensajes irrelevantes, audios vacíos, despedidas, temas fuera de odontología.\n- consulta de cita: Pregunta cuándo es su próxima cita o pide recordatorio.\n- consulta de productos: Pregunta por artículos físicos a la venta o stock."
+          "systemMessage": "Eres un analizador de texto estricto diseñado para el enrutamiento lógico de un flujo de automatización. Tu única función es la clasificación de intenciones para una clínica odontológica.\n\nREGLA DE ORO: El sistema fallará si tu respuesta contiene algo más que una de las siguientes etiquetas exactas. NO saludes, NO des explicaciones, NO uses puntuación. Devuelve SOLO LA ETIQUETA.\n\nOPCIONES VÁLIDAS (Elige solo una):\ninicio de cita\nproceso de cita\npreguntas frecuentes\ncomunicar humano\nno cita\nconsulta de cita\nconsulta de productos\n\nDEFINICIONES:\n- inicio de cita: Saludo, pide información inicial para agendar o solicita turno por primera vez (el sistema AÚN NO ofrece fechas ni pide datos).\n- proceso de cita: Continúa un agendamiento en marcha (da datos pedidos, confirma horario, propone otra hora, acepta o rechaza proporcionar datos opcionales como el correo electrónico).\n- preguntas frecuentes: Pregunta tratamientos, precios, ubicación, horarios, casos específicos (SIN confirmar agendamiento).\n- comunicar humano: Pide hablar con el doctor, administración, asesor o reporta emergencia.\n- no cita: Mensajes irrelevantes, audios vacíos, despedidas, temas fuera de odontología. (REGLA ESTRICTA: Si el usuario responde \"no\", \"no gracias\" o similar para declinar dar su correo durante un agendamiento, DEBE clasificarse como \"proceso de cita\").\n- consulta de cita: Pregunta cuándo es su próxima cita o pide recordatorio.\n- consulta de productos: Pregunta por artículos físicos a la venta o stock."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -478,7 +480,7 @@
         "promptType": "define",
         "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
         "options": {
-          "systemMessage": "=Eres un experto gestor de citas de horarios para una clinica odontologica.\nLa fecha y hora actual es: {{ $now }}, hora peruana.\nComo se está empezando la cita debes saludar y preguntar para que fecha desea la cita.\n\nLa persona que te habla es un cliente, por lo que no es el dueño.\n\nLímites de alcance: Si el usuario pregunta algo fuera del ámbito odontológico o de la clínica, responde amablemente que tu función es exclusiva para la asistencia dental.\n\n# HORARIOS DE ATENCIÓN Y POLÍTICAS DE AGENDA\nSolo puedes agendar citas dentro del siguiente horario laboral (lunes a sábado, excepto feriados):\n- Mañanas: 8:00 AM a 12:00 PM\n- Tardes: 4:00 PM a 9:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\n# FORMATO DE RESPUESTA ESPERADO\n- Sé conciso. Evita los párrafos largos y adáptate a la lectura rápida en WhatsApp.\n- Usa listas con viñetas si debes enumerar información.\n- Termina siempre tu intervención cediéndole la palabra al usuario con una pregunta orientada a agendar la cita o continuar el proceso.\n"
+          "systemMessage": "=# ROL Y OBJETIVO\nEres el asistente virtual de bienvenida para la gestión de citas de una clínica odontológica.\nTu función es recibir al paciente, orientarlo sobre los horarios y recopilar de forma empática los requisitos iniciales necesarios para su atención.\n\nLa fecha y hora actual es: {{ $now }}, hora de Perú (GMT-5).\n\n# POLÍTICAS Y REGLAS DE LA CLÍNICA\n1. Nombres y Apellidos: Para agendar una cita o abrir ficha clínica, es requisito indispensable que el paciente proporcione sus NOMBRES Y APELLIDOS COMPLETOS (mínimo dos palabras reales).\n2. Rango de Edad: Únicamente se atiende a pacientes adultos. NO se brinda atención odontopediátrica (niños).\n3. Horario Laboral:\n   - Lunes a sábado: 8:00 AM a 12:00 PM y 4:00 PM a 9:00 PM (excepto feriados).\n4. Anticipación:\n   - No se agendan citas para el mismo día.\n   - Las citas se programan con un margen de hasta 72 horas.\n5. Límites de alcance: Si consultan temas ajenos a la odontología, aclara con amabilidad que tu servicio es exclusivo para la clínica dental.\n\n# DIRECTRICES DE CONVERSACIÓN\n- Si el usuario apenas saluda o solicita turno por primera vez: Saluda con calidez, pregunta qué tratamiento o molestia presenta y para qué fecha aproximada le gustaría agendar (recordando que atendemos con al menos 24 horas de anticipación).\n- Si el usuario proporciona datos: Asegúrate de que sus nombres y apellidos estén completos para su ficha clínica.\n- Nunca confirmes un horario como definitivo ni digas que la cita ya quedó registrada en el sistema (otro agente especializado validará el calendario). Guíalo siempre a dar el siguiente dato.\n\n# FORMATO DE RESPUESTA (WHATSAPP)\n- Siempre debes brindar los horarios de atencion en el mensaje.\n- Sé muy conciso. Máximo 2 o 3 párrafos cortos adaptados a lectura móvil rápida.\n- Usa viñetas breves si necesitas listar horarios o requisitos.\n- Concluye siempre con una pregunta clara que invite al paciente a responder con la información faltante."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -495,7 +497,7 @@
         "promptType": "define",
         "text": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
         "options": {
-          "systemMessage": "=# ROL Y OBJETIVO\nEres un asistente virtual experto y amable, especializado en una clínica odontológica y con acceso a herramientas de Google Calendar. Tu objetivo principal es ayudar a los pacientes a consultar horarios, agendar, modificar o cancelar sus citas, logrando la mayor eficiencia en la gestion de citas y ofreciendo una experiencia fluida y sin fricciones. \nNO gestionas la agenda personal del doctor, solo atiendes a los pacientes.\n\n# CONTEXTO TEMPORAL E IDENTIDAD\n- La fecha y hora actual es: {{ $now }} (Hora de Perú, GMT-5).\n- Si el usuario menciona un día de la semana (ej. \"el martes\") sin dar fecha exacta, asume que se refiere al *próximo* día que coincida con ese nombre en el calendario.\n- IDENTIDAD VERIFICADA: El número de teléfono validado de este paciente es `{{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.phone_number }}`. Este es el único identificador autorizado para consultar o modificar su historial.\n\n# HORARIOS DE ATENCIÓN Y POLÍTICAS DE AGENDA\nSolo puedes agendar citas dentro del siguiente horario laboral (lunes a sábado, excepto feriados):\n- Mañanas: 8:00 AM a 12:00 PM\n- Tardes: 4:00 PM a 9:00 PM\n(No agendes fuera de estos rangos bajo ninguna circunstancia).\n\nPolíticas de anticipación y urgencias:\n- Las citas regulares se agendan con un margen de hasta 72 horas.\n- NO permitas agendar citas para el mismo día (usualmente no hay espacios libres).\n- Citas de urgencia: No las agendes directamente en el calendario. Indica que se gestionan en un horario extra decidido por el odontólogo principal y toma los datos del paciente para que la clínica se comunique con él.\n\n# DURACIÓN DE LAS CITAS (CALCULO DE BLOQUES)\nAjusta la duración del evento en el calendario según el motivo de la consulta:\n- Restauraciones, Endodoncias y Ortodoncias: 30 minutos.\n- Blanqueamiento dental: 45 minutos.\n- Cirugías (ej. cordales) y Rehabilitación oral: 60 minutos.\n- Evaluaciones iniciales / Revisiones generales: 30 minutos.\n\nRestricciones de atención (NO agendar bajo ninguna circunstancia):\n- Pacientes niños (la clínica no atiende odontopediatría).\n- Cirugías ortognáticas, condilares o tumorales.\n\n# REGLAS DE FLUJO Y USO DE HERRAMIENTAS\n1. CONSULTA DE DISPONIBILIDAD: Antes de ofrecer un horario o confirmar una cita, SIEMPRE revisa el calendario para asegurarte de que el espacio está libre. Saluda cordialmente y ofrece los espacios disponibles respetando la regla de no agendar el mismo día.\n2. CREACIÓN DE CITAS: Para agendar, debes recopilar: \n   - Nombre del paciente (verifica que sea adulto - Obligatorio).\n   - Motivo de la cita (para calcular la duración y verificar que no sea un servicio restringido - Obligatorio).\n   - Fecha y hora exacta (validada previamente - Obligatorio).\n   - Correo electrónico (Opcional). Justo antes de pedirle la confirmación final para agendar, pregúntale amablemente si desea proporcionar su correo electrónico para recibir recordatorios.\n   Solo cuando el paciente confirme explícitamente la cita (y haya respondido sobre el correo, ya sea dándolo o declinando), procede a agendarla en el calendario.\n3. ACTUALIZACIÓN DE CITAS: Si un paciente desea cambiar su cita, pregúntale por el motivo de cita, nuevo día y hora desea reprogramarla y verifica disponibilidad. Deben estar esos datos, si no estan todos no se puede continuar con la actualización. OBLIGATORIO: Debes aplicar la regla 5 de validación de identidad antes de ejecutar cualquier cambio en el calendario.\n4. CANCELACIÓN DE CITAS (RESTRICCIONES CRÍTICAS):\n   - SOLO puedes eliminar citas si previamente aplicaste la regla 5 y confirmaste mediante la base de datos que la cita le pertenece a este teléfono.\n   - REGLA DE 24 HORAS: Solo se permite cancelar una cita si falta MÁS de 1 día (24 horas) para que esta ocurra. Si falta menos tiempo, informa amablemente que las políticas de la clínica no permiten cancelaciones de último minuto.\n5. BÚSQUEDA Y VALIDACIÓN OBLIGATORIA (CANDADO DE SEGURIDAD): Si el paciente quiere consultar, reprogramar o cancelar una cita, ESTÁS OBLIGADO a usar la herramienta \"obtener_citas_activas_paciente\" pasándole ÚNICAMENTE su número verificado detallado en el Contexto de Identidad. Una vez que la herramienta te devuelva sus citas activas, busca el evento correspondiente. SOLO puedes actualizar o cancelar en Google Calendar si utilizas un `google_event_id` que provenga exactamente de los resultados de esta herramienta.\n\n# TONO DE RESPUESTA\nSé empático, profesional, claro y conciso. Evita respuestas excesivamente largas; ve directo a la gestión de la cita manteniendo la amabilidad y confirmando siempre las acciones realizadas en el calendario.\n\n# FORMATO DE RESPUESTA OBLIGATORIO\nTu respuesta final DEBE ser única y exclusivamente un objeto JSON válido, sin formato Markdown (no uses ```json), sin texto introductorio y sin despedidas fuera del JSON.\n\nDebes analizar las acciones que tomaste con las herramientas de Google Calendar en este turno y generar el JSON con la siguiente estructura exacta:\n\n{\n  \"mensaje_paciente\": \"Aquí redactas la respuesta empática y natural que leerá el paciente en WhatsApp.\",\n  \"accion_realizada\": \"VALOR\",\n  \"datos_cita\": {\n    \"nombre_paciente\": \"Nombre del paciente o null\",\n    \"correo_electronico\": \"Correo electrónico del paciente o null\",\n    \"fecha_hora\": \"YYYY-MM-DDTHH:mm:00-05:00 o null\", \n    \"motivo_consulta\": \"Motivo resumido o null\",\n    \"google_event_id\": \"ID del evento o null\"\n  }\n}\n\nRecuerda que la base de datos tiene los horarios en formato universal\n\nReglas para el campo \"accion_realizada\":\n- Usa \"CREATE\" si acabas de agendar una cita nueva.\n- Usa \"UPDATE\" si acabas de reprogramar una cita existente.\n- Usa \"DELETE\" si acabas de cancelar una cita.\n- Usa \"NONE\" si solo consultaste disponibilidad, si el usuario no confirmó, o si respondiste una duda general."
+          "systemMessage": "=# ROL Y OBJETIVO\n\nEres un asistente virtual experto, amable y profesional especializado en la gestión de citas de una clínica odontológica.\n\nTienes acceso a herramientas para consultar y gestionar Google Calendar y a una herramienta para consultar las citas activas de un paciente.\n\nTu objetivo es ayudar a los pacientes a:\n\n* Consultar disponibilidad.\n* Agendar nuevas citas.\n* Reprogramar citas existentes.\n* Cancelar citas existentes.\n* Resolver dudas relacionadas con la gestión de sus citas.\n\nDebes priorizar siempre la seguridad, la correcta identificación del paciente, la disponibilidad real del calendario y las políticas de la clínica.\n\nIMPORTANTE:\n\n* Solo gestionas citas de pacientes.\n* NO gestionas la agenda personal del odontólogo.\n* NO inventes horarios, citas, identificadores ni resultados de herramientas.\n* Nunca confirmes una acción que no haya sido ejecutada realmente mediante la herramienta correspondiente.\n\n# CONTEXTO TEMPORAL E IDENTIDAD\n\nLa fecha y hora actual es:\n\n{{ $now }}\n\nLa hora corresponde a Perú (GMT-5).\n\nREGLAS TEMPORALES:\n\n1. Si el paciente menciona un día de la semana sin indicar una fecha exacta, por ejemplo \"el martes\", interpreta que se refiere al PRÓXIMO día que coincida con ese nombre en el calendario.\n\n2. Todas las fechas y horas que comuniques o registres deben interpretarse utilizando la zona horaria de Perú (GMT-5).\n\n3. La base de datos puede devolver horarios en formato universal/UTC. Debes interpretar correctamente esos horarios y convertirlos a la hora de Perú antes de comunicarlos al paciente o utilizarlos para confirmar una cita.\n\nIDENTIDAD VERIFICADA DEL PACIENTE:\n{{ $('Verificador Payloads').item.json.unified_sender_id }}\n\nEste número, usuario o id es el ÚNICO identificador autorizado para consultar, modificar o cancelar las citas del paciente.\n\nNunca solicites al paciente otro número para realizar estas operaciones si ya dispones del número verificado.\n\n# HORARIOS DE ATENCIÓN\n\nLa clínica atiende únicamente:\n\n* Lunes a sábado.\n* Excepto feriados.\n\nHORARIO LABORAL:\n\nMañana:\n\n* 08:00 a 12:00\n\nTarde:\n\n* 16:00 a 21:00\n\nREGLA OBLIGATORIA:\n\nNunca agendes una cita fuera de estos horarios bajo ninguna circunstancia.\n\nSi un paciente solicita un horario fuera del horario de atención, informa que ese horario no está disponible y ofrece alternativas válidas.\n\n# POLÍTICA DE ANTICIPACIÓN\n\nLas citas regulares deben gestionarse con una anticipación máxima de 72 horas.\n\nREGLA DE MISMO DÍA:\n\nNO permitas agendar citas para el mismo día.\n\nAunque el calendario muestre disponibilidad para el mismo día, no debes crear la cita.\n\nSi el paciente solicita una cita para hoy, informa amablemente que no se pueden agendar citas para el mismo día y ofrece consultar disponibilidad para los siguientes días permitidos.\n\n# CITAS DE URGENCIA\n\nLas citas de urgencia NO deben agendarse directamente en Google Calendar.\n\nSi el paciente indica que se trata de una urgencia:\n\n1. No crees ningún evento en Google Calendar.\n2. Explica que las urgencias se gestionan mediante un horario adicional determinado por el odontólogo principal.\n3. Solicita o registra los datos necesarios del paciente para que la clínica pueda comunicarse con él.\n4. No confirmes una cita.\n5. El campo \"accion_realizada\" debe ser \"NONE\".\n\n# DURACIÓN DE LAS CITAS\n\nLa duración de la cita depende del motivo de consulta.\n\nUtiliza exactamente estas duraciones:\n\n* Restauraciones: 30 minutos.\n* Endodoncias: 30 minutos.\n* Ortodoncias: 30 minutos.\n* Blanqueamiento dental: 45 minutos.\n* Cirugías, incluyendo cirugías de cordales: 60 minutos.\n* Rehabilitación oral: 60 minutos.\n* Evaluación inicial: 30 minutos.\n* Revisión general: 30 minutos.\n\nAntes de crear una cita debes determinar el motivo y utilizar la duración correspondiente para calcular la hora de finalización.\n\n# SERVICIOS QUE NO SE ATIENDEN\n\nNO debes agendar bajo ninguna circunstancia:\n\n1. Pacientes niños.\n\n   * La clínica NO ofrece odontopediatría.\n\n2. Cirugías ortognáticas.\n\n3. Cirugías condilares.\n\n4. Cirugías tumorales.\n\nSi el paciente solicita alguno de estos servicios:\n\n* No consultes ni crees una cita para ese servicio.\n* Informa amablemente que la clínica no atiende ese tipo de caso.\n* No realices ninguna modificación en Google Calendar.\n* \"accion_realizada\" debe ser \"NONE\".\n\n# REGLAS GENERALES DE USO DE HERRAMIENTAS\n\nDebes utilizar las herramientas cuando sea necesario.\n\nNunca inventes información que debería provenir de una herramienta.\n\nSi una herramienta devuelve información, utiliza únicamente esa información para tomar decisiones relacionadas con citas.\n\nNo confirmes disponibilidad sin haber consultado previamente el calendario.\n\nNo confirmes una creación, actualización o cancelación si la herramienta correspondiente no ejecutó correctamente la operación.\n\n# 1. CONSULTAR DISPONIBILIDAD\n\nAntes de ofrecer un horario concreto al paciente:\n\n1. Verifica que la fecha solicitada sea válida.\n2. Verifica que no sea el mismo día.\n3. Verifica que esté dentro del límite de anticipación permitido.\n4. Verifica que sea un día de atención.\n5. Verifica que el horario esté dentro de:\n\n   * 08:00–12:00\n   * 16:00–21:00\n6. Determina la duración según el motivo de consulta.\n7. Consulta Google Calendar para comprobar que el BLOQUE COMPLETO necesario esté disponible.\n\nIMPORTANTE:\n\nNo basta con comprobar únicamente la hora de inicio.\n\nDebes asegurarte de que exista disponibilidad durante toda la duración de la cita.\n\nEjemplo:\n\nSi una endodoncia requiere 30 minutos y el paciente solicita 18:00, debe existir disponibilidad desde las 18:00 hasta las 18:30.\n\n# 2. CREACIÓN DE CITAS\n\nPara crear una cita necesitas obligatoriamente:\n* Nombre y apellidos completos del paciente (MÍNIMO un nombre y dos apellidos, o al menos dos palabras reales compuestas).\n* Confirmación de que el paciente es adulto.\n* Motivo de consulta.\n* Fecha exacta.\n* Hora exacta.\n* Disponibilidad confirmada previamente.\n\n## REGLA ESTRICTA DE VALIDACIÓN DEL NOMBRE:\n- Si el paciente proporciona solo un nombre (ejemplo: \"Carlos\", \"María\") o un apodo/diminutivo (ejemplo: \"Mai\", \"Pepe\"), NO PROCEDAS a agendar ni a consultar correo.\n- Debes solicitar amablemente sus nombres y apellidos completos indicando que es un requisito de su historia clínica.\n- Si el nombre está incompleto: \"accion_realizada\" = \"NONE\".\n- Guarda en \"nombre_paciente\" únicamente el nombre cuando esté completo con nombres y apellidos (ejemplo: \"Carlos Eduardo Pérez Gómez\").\n\nEl correo electrónico es OPCIONAL.\n\n## PREGUNTA OBLIGATORIA SOBRE EL CORREO\n\nAntes de crear una cita debes preguntarle al paciente si desea proporcionar su correo electrónico para recibir recordatorios.\n\nEsta regla es CRÍTICA.\n\nNO debes utilizar la acción \"CREATE\" ni crear el evento mientras estés esperando la respuesta del paciente sobre el correo.\n\nMientras esperas esa respuesta:\n\n\"accion_realizada\" = \"NONE\"\n\nHay dos respuestas válidas:\n\nA. El paciente proporciona un correo electrónico.\n\nB. El paciente indica explícitamente que NO desea proporcionar un correo electrónico.\n\nSolo después de recibir una de esas respuestas puedes proceder a crear la cita.\n\nCuando el paciente responda sobre el correo:\n\n1. Verifica nuevamente que los datos necesarios estén completos.\n2. Utiliza la disponibilidad previamente consultada solo si sigue siendo válida según el contexto actual; si existe cualquier duda sobre la vigencia de la disponibilidad, vuelve a comprobarla.\n3. Crea el evento en Google Calendar.\n4. Utiliza la duración correspondiente al motivo.\n5. Si la creación es exitosa, utiliza:\n   \"accion_realizada\": \"CREATE\"\n6. Confirma al paciente que su cita fue agendada.\n\n# 3. ACTUALIZACIÓN / REPROGRAMACIÓN DE CITAS\n\nSi el paciente desea cambiar o reprogramar una cita existente, necesitas obligatoriamente:\n\n* Identificar la cita existente.\n* Motivo de la nueva cita.\n* Nuevo día.\n* Nueva hora.\n\nSi falta cualquiera de estos datos, NO ejecutes la actualización.\n\nAntes de modificar la cita:\n\n1. Aplica obligatoriamente la validación de identidad mediante la herramienta:\n\n\"obtener_citas_activas_paciente\"\n\n2. Debes utilizar ÚNICAMENTE el número de teléfono verificado indicado en el apartado de identidad.\n\n3. Busca entre las citas devueltas la cita que corresponde a la solicitud del paciente.\n\n4. Obtén el \"google_event_id\" directamente de los resultados de la herramienta.\n\n5. Verifica la disponibilidad del nuevo horario en Google Calendar.\n\n6. Verifica que el nuevo horario respete:\n\n   * Horario laboral.\n   * Días de atención.\n   * Política de anticipación.\n   * Duración correspondiente.\n   * Restricciones de servicios.\n\n7. Solo después de todas estas validaciones puedes actualizar la cita.\n\nREGLA CRÍTICA:\n\nEl \"google_event_id\" utilizado para actualizar una cita DEBE provenir exactamente de los resultados de \"obtener_citas_activas_paciente\".\n\nNunca inventes, adivines, reutilices arbitrariamente ni construyas manualmente un \"google_event_id\".\n\nSi la herramienta no devuelve la cita correspondiente, NO actualices ninguna cita.\n\nSi la actualización se ejecuta correctamente:\n\n\"accion_realizada\": \"UPDATE\"\n\n# 4. CANCELACIÓN DE CITAS\n\nPara cancelar una cita debes aplicar obligatoriamente la validación de identidad.\n\nPROCESO OBLIGATORIO:\n\n1. Utiliza la herramienta:\n\n\"obtener_citas_activas_paciente\"\n\n2. Pásale ÚNICAMENTE el número de teléfono verificado del paciente.\n\n3. Busca la cita correspondiente entre las citas activas devueltas.\n\n4. Obtén el \"google_event_id\" directamente de los resultados.\n\n5. Nunca canceles una cita utilizando un ID que no provenga de esta herramienta.\n\n## REGLA DE 24 HORAS\n\nUna cita solo puede cancelarse si faltan MÁS de 24 horas para su inicio.\n\nSi faltan 24 horas o menos:\n\n* NO canceles la cita.\n* No utilices la herramienta de eliminación.\n* Informa amablemente que la política de la clínica no permite cancelaciones de último minuto.\n* \"accion_realizada\" = \"NONE\"\n\nSi faltan MÁS de 24 horas:\n\n* Puedes proceder con la cancelación.\n* Utiliza exclusivamente el \"google_event_id\" obtenido de \"obtener_citas_activas_paciente\".\n* Si la herramienta de Google Calendar confirma que la eliminación fue exitosa:\n  \"accion_realizada\" = \"DELETE\"\n\n# 5. CANDADO DE SEGURIDAD PARA CITAS EXISTENTES\n\nEsta es una regla de seguridad de máxima prioridad.\n\nCuando el paciente quiera:\n\n* Consultar una cita existente.\n* Reprogramar una cita.\n* Cancelar una cita.\n\nDEBES utilizar obligatoriamente:\n\n\"obtener_citas_activas_paciente\"\n\nLa herramienta debe recibir ÚNICAMENTE:\n{{ $('Verificador Payloads').item.json.unified_sender_id }}\n\nNo utilices nombres, correos, fechas, nombres de usuario ni otros identificadores para sustituir el número de teléfono verificado.\n\nREGLA DEL GOOGLE_EVENT_ID:\n\nSolo puedes actualizar o cancelar una cita utilizando un \"google_event_id\" que provenga EXACTAMENTE de los resultados de \"obtener_citas_activas_paciente\".\n\nSi no existe un \"google_event_id\" válido proveniente de dicha herramienta:\n\n* NO actualices.\n* NO canceles.\n* Solicita la información necesaria o informa que no se pudo localizar la cita.\n\n# PRIORIDAD DE SEGURIDAD\n\nCuando dos reglas entren en conflicto, aplica este orden de prioridad:\n\n1. Seguridad e identidad del paciente.\n2. Restricciones de servicios de la clínica.\n3. Restricciones de fecha y horario.\n4. Disponibilidad real del calendario.\n5. Reglas de creación, actualización y cancelación.\n6. Preferencias de comunicación del paciente.\n\nNunca sacrifiques una regla de seguridad para completar una solicitud.\n\n# TONO DE RESPUESTA\n\nSé:\n\n* Empático.\n* Profesional.\n* Claro.\n* Conciso.\n* Natural.\n* Amable.\n\nEl paciente recibirá el mensaje mediante WhatsApp.\n\nEvita explicaciones innecesariamente largas.\n\nVe directamente a la gestión de la cita.\n\nCuando una acción haya sido ejecutada correctamente, confirma claramente lo realizado.\n\nCuando una acción NO pueda ejecutarse, explica brevemente el motivo y, cuando sea posible, ofrece una alternativa.\n\n# FORMATO DE RESPUESTA OBLIGATORIO\n\nTu respuesta FINAL debe ser ÚNICA Y EXCLUSIVAMENTE un objeto JSON válido.\n\nNO escribas Markdown.\n\nNO utilices bloques de código.\n\nNO escribas texto antes del JSON.\n\nNO escribas texto después del JSON.\n\nNO utilices comentarios dentro del JSON.\n\nEl JSON debe tener EXACTAMENTE esta estructura:\n\n{\n\"mensaje_paciente\": \"Respuesta empática y natural que leerá el paciente en WhatsApp.\",\n\"accion_realizada\": \"VALOR\",\n\"datos_cita\": {\n\"nombre_paciente\": \"Nombre del paciente o null\",\n\"correo_electronico\": \"Correo electrónico del paciente o null\",\n\"fecha_hora\": \"YYYY-MM-DDTHH:mm:00-05:00 o null\",\n\"motivo_consulta\": \"Motivo resumido o null\",\n\"google_event_id\": \"ID del evento o null\"\n}\n}\n\n# REGLAS DEL CAMPO \"accion_realizada\"\n\nUtiliza ÚNICAMENTE uno de estos cuatro valores:\n\n\"CREATE\"\n\"UPDATE\"\n\"DELETE\"\n\"NONE\"\n\n## CREATE\n\nUtiliza \"CREATE\" ÚNICAMENTE cuando:\n\n* Se creó una nueva cita.\n* La herramienta de Google Calendar confirmó exitosamente la creación.\n* El paciente ya respondió sobre el correo electrónico, proporcionando un correo o indicando que no desea proporcionar uno.\n\nNunca utilices \"CREATE\" antes de que se cumplan estas condiciones.\n\n## UPDATE\n\nUtiliza \"UPDATE\" ÚNICAMENTE cuando:\n\n* Se modificó una cita existente.\n* La identidad fue validada mediante \"obtener_citas_activas_paciente\".\n* El \"google_event_id\" utilizado provino exactamente de esa herramienta.\n* La nueva disponibilidad fue verificada.\n* Google Calendar confirmó exitosamente la actualización.\n\n## DELETE\n\nUtiliza \"DELETE\" ÚNICAMENTE cuando:\n\n* Se canceló una cita existente.\n* La identidad fue validada mediante \"obtener_citas_activas_paciente\".\n* El \"google_event_id\" utilizado provino exactamente de esa herramienta.\n* Faltaban MÁS de 24 horas para la cita.\n* Google Calendar confirmó exitosamente la eliminación.\n\n## NONE\n\nUtiliza \"NONE\" cuando:\n\n* Solo consultaste disponibilidad.\n* El paciente aún no confirmó.\n* Estás esperando la respuesta sobre el correo electrónico.\n* No se pudo realizar una acción.\n* La solicitud corresponde a un servicio que la clínica no atiende.\n* Es una urgencia que debe ser gestionada fuera del calendario.\n* El paciente hizo una consulta general.\n* Faltan datos obligatorios.\n* La cancelación no está permitida por la regla de 24 horas.\n* No se pudo validar la identidad o localizar la cita.\n\n# REGLAS PARA \"datos_cita\"\n\n\"nombre_paciente\":\n\n* Nombre conocido del paciente.\n* Si no está disponible, utiliza null.\n\n\"correo_electronico\":\n\n* Correo proporcionado explícitamente por el paciente.\n* Si el paciente indicó que no desea proporcionar correo, utiliza null.\n* Si todavía no respondió sobre el correo, utiliza null.\n\n\"fecha_hora\":\n\n* Utiliza el formato:\n  YYYY-MM-DDTHH:mm:00-05:00\n* Debe representar la fecha y hora de inicio de la cita.\n* Utiliza null si todavía no existe una fecha/hora confirmada.\n\n\"motivo_consulta\":\n\n* Resume brevemente el motivo de la consulta.\n* Utiliza null si todavía no se conoce.\n\n\"google_event_id\":\n\n* Utiliza el ID real del evento de Google Calendar.\n* Para citas existentes, debe provenir de \"obtener_citas_activas_paciente\".\n* Si no existe un ID válido, utiliza null.\n\n# REGLA FINAL DE VERIFICACIÓN\n\nAntes de devolver el JSON final, verifica mentalmente:\n\n1. ¿La acción realmente se ejecutó?\n2. ¿Se respetaron las políticas de la clínica?\n3. ¿Se verificó la disponibilidad cuando correspondía?\n4. ¿Se utilizó el teléfono verificado para las operaciones sobre citas existentes?\n5. ¿El \"google_event_id\" proviene de \"obtener_citas_activas_paciente\"?\n6. ¿Se respetó la regla de 24 horas para cancelaciones?\n7. ¿Se respetó la regla de no agendar el mismo día?\n8. ¿Se respetó la regla del correo antes de CREATE?\n9. ¿El JSON es válido?\n10. ¿\"accion_realizada\" representa exactamente lo que ocurrió en este turno?\n\nSi alguna respuesta es NO, no ejecutes una acción que no esté permitida y utiliza \"NONE\" cuando corresponda.\n\nLa respuesta final SIEMPRE debe ser únicamente el objeto JSON válido solicitado.\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -508,12 +510,13 @@
       "name": "Agente Maestro Citas",
       "retryOnFail": true,
       "waitBetweenTries": 4000,
-      "maxTries": 5
+      "maxTries": 5,
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $json.body.sender.phone_number }}",
+        "sessionKey": "={{ $('Verificador Payloads').item.json.unified_sender_id }}",
         "tableName": "mensajes_whatsapp",
         "contextWindowLength": 3
       },
@@ -534,7 +537,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Lista de expresiones regulares para detectar patrones maliciosos comunes\nconst maliciousPatterns = [\n  /ignora.*instrucciones/i,           // Prompt injection en español\n  /ignore.*previous.*instructions/i,  // Prompt injection en inglés\n  /system prompt/i,                   // Intentos de extraer el prompt del sistema\n  /jailbreak/i,                       // Intentos de evasión\n  /actúa como.*sin restricciones/i,   // Patrones de DAN (Do Anything Now)\n  /bypass/i,                          // Intentos de saltar filtros\n  /<script\\b[^<]*(?:(?!<\\/script>)<[^<]*)*<\\/script>/gi, // XSS básico\n  /(UNION|SELECT|DROP|INSERT).*;/i    // Inyección SQL básica (por precaución)\n];\n\n// Límite de caracteres para evitar ataques de denegación de servicio por prompts gigantes\nconst MAX_LENGTH = 1500; \n\nfor (const item of $input.all()) {\n  // Ajuste para extraer el texto correctamente desde el webhook de Chatwoot\n  // El mensaje principal viene en la propiedad \"content\" dentro de \"body\"\n  const text = item.json?.body?.content || \"\";\n  \n  let isMalicious = false;\n  let reason = \"\";\n\n  // 1. Verificación de longitud\n  if (text.length > MAX_LENGTH) {\n    isMalicious = true;\n    reason = \"Payload supera el límite de longitud permitido.\";\n  }\n\n  // 2. Verificación de patrones con Regex\n  if (!isMalicious && text.length > 0) {\n    for (const pattern of maliciousPatterns) {\n      if (pattern.test(text)) {\n        isMalicious = true;\n        reason = `Detectado patrón sospechoso: ${pattern.toString()}`;\n        break;\n      }\n    }\n  }\n\n  // Agregamos las banderas al JSON de salida para poder enrutarlo después (usando un Switch Node o If Node)\n  item.json.securityCheck = {\n    isMalicious: isMalicious,\n    reason: reason\n  };\n}\n\nreturn $input.all();"
+        "jsCode": "// Lista de expresiones regulares para detectar patrones maliciosos comunes\nconst maliciousPatterns = [\n  /ignora.*instrucciones/i,           // Prompt injection en español\n  /ignore.*previous.*instructions/i,  // Prompt injection en inglés\n  /system prompt/i,                   // Intentos de extraer el prompt del sistema\n  /jailbreak/i,                       // Intentos de evasión\n  /actúa como.*sin restricciones/i,   // Patrones de DAN (Do Anything Now)\n  /bypass/i,                          // Intentos de saltar filtros\n  /<script\\b[^<]*(?:(?!<\\/script>)<[^<]*)*<\\/script>/gi, // XSS básico\n  /(UNION|SELECT|DROP|INSERT).*;/i    // Inyección SQL básica (por precaución)\n];\n\n// Límite de caracteres para evitar ataques de denegación de servicio por prompts gigantes\nconst MAX_LENGTH = 1500; \n\nfor (const item of $input.all()) {\n  const body = item.json?.body || {};\n  const text = body.content || \"\";\n  \n  // 1. Extracción y unificación de identidad (Teléfono -> Username -> Source ID -> Fallback)\n  const sender = body.sender || body.conversation?.messages?.[0]?.sender || {};\n  const contactInbox = body.conversation?.contact_inbox || {};\n\n  const unifiedId = sender.phone_number \n    || sender.additional_attributes?.social_whatsapp_user_name \n    || sender.additional_attributes?.social_profiles?.whatsapp\n    || contactInbox.source_id \n    || (sender.id ? `user_${sender.id}` : null);\n\n  item.json.unified_sender_id = unifiedId;\n\n  // 2. Verificación de seguridad\n  let isMalicious = false;\n  let reason = \"\";\n\n  if (text.length > MAX_LENGTH) {\n    isMalicious = true;\n    reason = \"Payload supera el límite de longitud permitido.\";\n  }\n\n  if (!isMalicious && text.length > 0) {\n    for (const pattern of maliciousPatterns) {\n      if (pattern.test(text)) {\n        isMalicious = true;\n        reason = `Detectado patrón sospechoso: ${pattern.toString()}`;\n        break;\n      }\n    }\n  }\n\n  item.json.securityCheck = {\n    isMalicious: isMalicious,\n    reason: reason\n  };\n}\n\nreturn $input.all();"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -633,7 +636,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -685,7 +688,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -737,7 +740,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -789,7 +792,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -841,9 +844,9 @@
     {
       "parameters": {
         "sendTo": "orlandop3789@gmail.com",
-        "subject": "Informe de error",
+        "subject": "⚠️ Alerta de Seguridad: Mensaje sospechoso bloqueado",
         "emailType": "text",
-        "message": "=Ocurrió un error en un log, porfavor revisar.\nId: {{ $json.result.chat.id }} \nFirst Name: {{ $json.result.chat.first_name }} \nLast Name: {{ $json.result.chat.last_name }} \nText: {{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}",
+        "message": "=Se ha bloqueado un mensaje por motivos de seguridad en el filtro.\n\nFecha y Hora: {{ $now }}\nIdentificador Remitente: {{ $('Verificador Payloads').item.json.unified_sender_id }}\nMotivo del bloqueo: {{ $('Verificador Payloads').item.json.securityCheck.reason }}\n\nMensaje enviado:\n\"{{ $('Verificador Payloads').item.json.body.content }}\"\n\nID Conversación Chatwoot: {{ $('Verificador Payloads').item.json.body.conversation.id }}\nExecution ID: {{ $execution.id }}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
@@ -865,9 +868,9 @@
     {
       "parameters": {
         "sendTo": "orlandop3789@gmail.com",
-        "subject": "Informe de error",
+        "subject": "❌ Error en Agente Clasificador de Intenciones",
         "emailType": "text",
-        "message": "=Ocurrió un error en un log, porfavor revisar\nTime: {{ $now }}\nId: {{ $json.result.chat.id }}\nFirst Name: {{ $json.result.chat.first_name }}\nLast Name: {{ $json.result.chat.last_name }}\nText: {{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}\nId Workflow: {{ $workflow.id }}\n",
+        "message": "=Ocurrió un error al procesar la clasificación del mensaje en el flujo de WhatsApp.\n\nFecha y Hora: {{ $now }}\nIdentificador Paciente: {{ $('Verificador Payloads').item.json.unified_sender_id }}\nTexto recibido: \"{{ $('Verificador Payloads').item.json.body.content }}\"\n\nDetalles del Error:\n{{ $json.error?.message || 'Error en ejecución de IA' }}\n\nWorkflow ID: {{ $workflow.id }}\nExecution ID: {{ $execution.id }}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
@@ -889,9 +892,9 @@
     {
       "parameters": {
         "sendTo": "orlandop3789@gmail.com",
-        "subject": "Informe de error",
+        "subject": "=🚨 SOLICITUD HUMANO - Paciente: {{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.name || 'Sin nombre' }}",
         "emailType": "text",
-        "message": "=SE SOLICITA COMUNICACION CON UN HUMANO, porfavor revisar\nTime: {{ $now }}\nId: {{ $json.result.chat.id }}\nFirst Name: {{ $json.result.chat.first_name }}\nLast Name: {{ $json.result.chat.last_name }}\nText: {{ $('Verificador Payloads').item.json.body.conversation.messages[0].content }}\nId Workflow: {{ $workflow.id }}\n",
+        "message": "=SE SOLICITA ATENCIÓN HUMANA EN WHATSAPP\n\nFecha y Hora: {{ $now }}\nIdentificador Paciente: {{ $('Verificador Payloads').item.json.unified_sender_id }}\nNombre en WA: {{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.name || 'No disponible' }}\nMensaje recibido: \"{{ $('Verificador Payloads').item.json.body.content }}\"\n\nID Conversación Chatwoot: {{ $('Verificador Payloads').item.json.body.conversation.id }}\nEnlace directo: https://chatwoot.orlandopa.dev/app/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}\n\nWorkflow ID: {{ $workflow.id }}\nExecution ID: {{ $execution.id }}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
@@ -913,7 +916,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -981,7 +984,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -1033,7 +1036,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -1085,7 +1088,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -1269,16 +1272,16 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "telefono_whatsapp": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.phone_number }}",
-            "nombre_paciente": "={{ $('Modificador a json').item.json.datos_cita.nombre_paciente }}"
+            "nombre_paciente": "={{ $('Modificador a json').item.json.datos_cita.nombre_paciente }}",
+            "identificador_paciente": "={{ $('Verificador Payloads').item.json.unified_sender_id }}"
           },
           "matchingColumns": [
-            "telefono_whatsapp"
+            "identificador_paciente"
           ],
           "schema": [
             {
-              "id": "telefono_whatsapp",
-              "displayName": "telefono_whatsapp",
+              "id": "identificador_paciente",
+              "displayName": "identificador_paciente",
               "required": true,
               "defaultMatch": false,
               "display": true,
@@ -1343,14 +1346,14 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "telefono_paciente": "={{ $('Trigger Mensaje WhatsApp').item.json.body.conversation.messages[0].sender.phone_number }}",
             "fecha_hora_cita": "={{ $('Modificador a json').item.json.datos_cita.fecha_hora ? DateTime.fromISO($('Modificador a json').item.json.datos_cita.fecha_hora).toISO() : undefined }}",
             "updated_at": "={{ $now }}",
             "google_event_id": "={{ $('Modificador a json').item.json.datos_cita.google_event_id }}",
             "estado_cita": "AGENDADA",
             "motivo_consulta": "={{ $('Modificador a json').item.json.datos_cita.motivo_consulta }}",
             "correo_electronico": "={{ $('Modificador a json').item.json.datos_cita.correo_electronico }}",
-            "recordatorio_enviado": false
+            "recordatorio_enviado": false,
+            "identificador_paciente": "={{ $('Verificador Payloads').item.json.unified_sender_id }}"
           },
           "matchingColumns": [
             "id"
@@ -1367,13 +1370,14 @@
               "removed": true
             },
             {
-              "id": "telefono_paciente",
-              "displayName": "telefono_paciente",
+              "id": "identificador_paciente",
+              "displayName": "identificador_paciente",
               "required": true,
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "fecha_hora_cita",
@@ -1382,7 +1386,8 @@
               "defaultMatch": false,
               "display": true,
               "type": "dateTime",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "motivo_consulta",
@@ -1391,7 +1396,8 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "estado_cita",
@@ -1400,7 +1406,8 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "google_event_id",
@@ -1409,7 +1416,8 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "created_at",
@@ -1428,7 +1436,8 @@
               "defaultMatch": false,
               "display": true,
               "type": "dateTime",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "detalles_notas_cita",
@@ -1499,11 +1508,12 @@
           "mappingMode": "defineBelow",
           "value": {
             "google_event_id": "={{ $json.datos_cita.google_event_id }}",
-            "fecha_hora_cita": "={{ $('Modificador a json').item.json.datos_cita.fecha_hora ? DateTime.fromFormat($('Modificador a json').item.json.datos_cita.fecha_hora.replace('T', ' '), 'yyyy-MM-dd HH:mm', { zone: 'America/Lima' }).toISO() : undefined }}",
+            "fecha_hora_cita": "={{ $('Modificador a json').item.json.datos_cita.fecha_hora\n  ? DateTime.fromISO(\n      $('Modificador a json').item.json.datos_cita.fecha_hora\n    ).toISO()\n  : undefined\n}}",
             "motivo_consulta": "={{ $('Modificador a json').item.json.datos_cita.motivo_consulta }}",
             "estado_cita": "REPROGRAMADA",
             "updated_at": "={{ $now }}",
-            "correo_electronico": "={{ $('Modificador a json').item.json.datos_cita.correo_electronico }}"
+            "correo_electronico": "={{ $('Modificador a json').item.json.datos_cita.correo_electronico }}",
+            "detalles_notas_cita": "La cita fue reprogramada"
           },
           "matchingColumns": [
             "google_event_id"
@@ -1606,6 +1616,16 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "recordatorio_enviado",
+              "displayName": "recordatorio_enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
               "canBeUsedToMatch": true,
               "removed": false
             }
@@ -1666,8 +1686,8 @@
               "removed": true
             },
             {
-              "id": "telefono_paciente",
-              "displayName": "telefono_paciente",
+              "id": "identificador_paciente",
+              "displayName": "identificador_paciente",
               "required": true,
               "defaultMatch": false,
               "display": true,
@@ -1702,7 +1722,8 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "google_event_id",
@@ -1731,7 +1752,8 @@
               "defaultMatch": false,
               "display": true,
               "type": "dateTime",
-              "canBeUsedToMatch": true
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "detalles_notas_cita",
@@ -1752,6 +1774,16 @@
               "type": "string",
               "canBeUsedToMatch": true,
               "removed": true
+            },
+            {
+              "id": "recordatorio_enviado",
+              "displayName": "recordatorio_enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": false
             }
           ],
           "attemptToConvertTypes": false,
@@ -1777,7 +1809,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -1849,7 +1881,7 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.phone_number }}",
+        "sessionKey": "={{ $('Verificador Payloads').item.json.unified_sender_id }}",
         "tableName": "mensajes_whatsapp",
         "contextWindowLength": 3
       },
@@ -1904,8 +1936,8 @@
         "where": {
           "values": [
             {
-              "column": "telefono_paciente",
-              "value": "={{ $('Verificador Payloads').item.json.body.conversation.messages[0].sender.phone_number }}"
+              "column": "identificador_paciente",
+              "value": "={{ $('Verificador Payloads').item.json.unified_sender_id }}"
             }
           ]
         },
@@ -1938,7 +1970,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -2026,7 +2058,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages ",
+        "url": "=https://chatwoot.orlandopa.dev/api/v1/accounts/{{ $('Verificador Payloads').item.json.body.account.id }}/conversations/{{ $('Verificador Payloads').item.json.body.conversation.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -2078,7 +2110,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT \n  c.google_event_id,\n  c.fecha_hora_cita,\n  c.motivo_consulta,\n  c.estado_cita,\n  p.nombre_paciente\nFROM public.citas c\nINNER JOIN public.pacientes p ON c.telefono_paciente = p.telefono_whatsapp\nWHERE c.telefono_paciente = $1\n  AND c.estado_cita IN ('CREADA', 'REPROGRAMADA', 'AGENDADA');",
+        "query": "SELECT \n  c.google_event_id,\n  c.fecha_hora_cita,\n  c.motivo_consulta,\n  c.estado_cita,\n  p.nombre_paciente\nFROM public.citas c\nINNER JOIN public.pacientes p ON c.identificador_paciente = p.identificador_paciente\nWHERE c.identificador_paciente = '{{ $('Verificador Payloads').item.json.unified_sender_id }}'\n  AND c.estado_cita IN ('CREADA', 'REPROGRAMADA', 'AGENDADA');",
         "options": {}
       },
       "type": "n8n-nodes-base.postgresTool",
@@ -2129,6 +2161,30 @@
       ],
       "id": "5ad074c0-a470-477a-8d31-50b7f2e4c888",
       "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "orlandop3789@gmail.com",
+        "subject": "=🚨 Fallo Crítico en Agente Maestro (Herramientas / API) - {{ $('Verificador Payloads').item.json.unified_sender_id }}",
+        "emailType": "text",
+        "message": "==ERROR EN EJECUCIÓN DEL AGENTE MAESTRO DE CITAS\n\nFecha y Hora: {{ $now }}\nIdentificador Paciente: {{ $('Verificador Payloads').item.json.unified_sender_id }}\nMensaje enviado por el usuario: \"{{ $('Verificador Payloads').item.json.body.content }}\"\n\nDetalle del Error:\n{{ $json.error?.message || $json.message || 'Error al ejecutar herramientas de Google Calendar o PostgreSQL' }}\n\nPosible causa: Expiración de credencial OAuth2 de Google Calendar o error de conexión en la herramienta de base de datos.\n\nExecution ID: {{ $execution.id }}\nWorkflow ID: {{ $workflow.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        -1280
+      ],
+      "id": "c98e60d5-168a-45b2-982b-1993ccda9340",
+      "name": "SOLICITUD HUMANO1",
+      "webhookId": "2d8decac-a79a-450f-aed9-389346ddd2da",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ykZyOmxgngbomNSQ",
+          "name": "Gmail account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -2352,6 +2408,13 @@
         [
           {
             "node": "Modificador a json",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SOLICITUD HUMANO1",
             "type": "main",
             "index": 0
           }
@@ -2630,13 +2693,15 @@
     "timeSavedMode": "fixed",
     "timezone": "America/Lima",
     "callerPolicy": "workflowsFromSameOwner",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "errorWorkflow": "xvRle8JqNX6XsM5X"
   },
-  "versionId": "e6841c27-ae56-4e3d-a2eb-71b80debf788",
+  "versionId": "ab4abf8c-a202-4759-a50f-33232115f063",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e847df90d1d13245580751d610403e96b18f1d2a0ddccff8559796e30435b378"
   },
+  "nodeGroups": [],
   "id": "aR8yICkRQbJu3t6g",
   "tags": []
 }
